@@ -1,5 +1,7 @@
 package com.scnu.whiboxkey.pksys.models;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -20,11 +22,19 @@ public class ClientKey implements Serializable {
 
     //黑盒密钥
     @Column(length = 50)
-    private String bkey;
+    private String blackKey;
 
-    //白盒密钥表，以文件形式存储
+    //白盒加密算法名字
+    @Column(nullable = false, length = 50)
+    private String whiboxAlgName;
+
+    //白盒加密密钥表，以文件形式存储
     @Column(length = 254)
-    private String wkfpath;
+    private String encKfpath;
+
+    //白盒解密密钥表，以文件形式存储
+    @Column(length = 254)
+    private String decKfpath;
 
     //白盒密钥表的通行证，含该通行证才能下载密钥表
     @Column(length = 50, unique = true)
@@ -51,7 +61,6 @@ public class ClientKey implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
-
     public ClientKey() {
     }
 
@@ -70,8 +79,10 @@ public class ClientKey implements Serializable {
         return "ClientKey{" +
                 "id=" + id +
                 ", serial='" + serial + '\'' +
-                ", bkey='" + bkey + '\'' +
-                ", wkfpath='" + wkfpath + '\'' +
+                ", blackKey='" + blackKey + '\'' +
+                ", whiboxAlgName='" + whiboxAlgName + '\'' +
+                ", encKfpath='" + encKfpath + '\'' +
+                ", decKfpath='" + decKfpath + '\'' +
                 ", pass='" + pass + '\'' +
                 ", vaild=" + vaild +
                 ", duration=" + duration +
@@ -97,20 +108,36 @@ public class ClientKey implements Serializable {
         this.serial = serial;
     }
 
-    public String getBkey() {
-        return bkey;
+    public String getBlackKey() {
+        return blackKey;
     }
 
-    public void setBkey(String bkey) {
-        this.bkey = bkey;
+    public void setBlackKey(String blackKey) {
+        this.blackKey = blackKey;
     }
 
-    public String getWkfpath() {
-        return wkfpath;
+    public String getWhiboxAlgName() {
+        return whiboxAlgName;
     }
 
-    public void setWkfpath(String wkfpath) {
-        this.wkfpath = wkfpath;
+    public void setWhiboxAlgName(String whiboxAlgName) {
+        this.whiboxAlgName = whiboxAlgName;
+    }
+
+    public String getEncKfpath() {
+        return encKfpath;
+    }
+
+    public void setEncKfpath(String encKfpath) {
+        this.encKfpath = encKfpath;
+    }
+
+    public String getDecKfpath() {
+        return decKfpath;
+    }
+
+    public void setDecKfpath(String decKfpath) {
+        this.decKfpath = decKfpath;
     }
 
     public String getPass() {

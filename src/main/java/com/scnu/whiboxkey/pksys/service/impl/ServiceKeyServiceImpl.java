@@ -21,6 +21,9 @@ public class ServiceKeyServiceImpl implements ServerKeyService {
     @Autowired
     private ServerKeyRepository serverKeyRepository;
 
+    @Autowired
+    private ClientKeyService clientKeyService;
+
     @Override
     public List<ServerKey> findAll() {
         return serverKeyRepository.findAll();
@@ -49,6 +52,11 @@ public class ServiceKeyServiceImpl implements ServerKeyService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        ServerKey sk = this.findById(id);
+        Collection<ClientKey> ckCollection = sk.getClientKeyList();
+        for(ClientKey it: ckCollection){
+            clientKeyService.deleteById(it.getId());
+        }
         serverKeyRepository.deleteById(id);
     }
 

@@ -48,8 +48,13 @@ public class ClientKeyServiceImpl implements ClientKeyService {
     @Transactional
     public void deleteById(Long id) {
         ClientKey clientKey = this.findById(id);
-        String oldKfpath = clientKey.getWkfpath();
+        String oldKfpath = clientKey.getEncKfpath();
         File oldkfile = new File(oldKfpath);
+        if(oldkfile.exists()){
+            oldkfile.delete();
+        }
+        oldKfpath = clientKey.getDecKfpath();
+        oldkfile = new File(oldKfpath);
         if(oldkfile.exists()){
             oldkfile.delete();
         }

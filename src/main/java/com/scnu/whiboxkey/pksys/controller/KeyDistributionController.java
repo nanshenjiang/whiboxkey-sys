@@ -29,17 +29,39 @@ public class KeyDistributionController {
 
     //密钥过期，重新生成随机密钥，并更新数据库
     private void genRandKeyAndUpdateDB(ClientKey clientKey) throws FileNotFoundException {
+        //生成随机密钥
         String key = RandomUtils.randomString(16);
-        WBCryptolib.WBCRYPTO_wbsm4_context ctx= WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 1);
-        String fpath = WhiboxKeyUtils.keyToFileOfWBSM4(ctx);
+        String encfpath;
+        String decfpath;
+        //选择算法
+        if(clientKey.getWhiboxAlgName().equals("dummyround-SM4")) {
+            //算法为dummyround-SM4
+            //生成白盒加密表
+            WBCryptolib.WBCRYPTO_wbsm4_context enc_ctx = WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 1);
+            encfpath = WhiboxKeyUtils.keyToFileOfWBSM4(enc_ctx);
+            //生成白盒解密表
+            WBCryptolib.WBCRYPTO_wbsm4_context dec_ctx = WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 0);
+            decfpath = WhiboxKeyUtils.keyToFileOfWBSM4(dec_ctx);
+        }else {
+            //生成白盒加密表
+            WBCryptolib.WBCRYPTO_wbsm4_context enc_ctx = WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 1);
+            encfpath = WhiboxKeyUtils.keyToFileOfWBSM4(enc_ctx);
+            //生成白盒解密表
+            WBCryptolib.WBCRYPTO_wbsm4_context dec_ctx = WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 0);
+            decfpath = WhiboxKeyUtils.keyToFileOfWBSM4(dec_ctx);
+        }
+        //生成新通行证
         String pass = RandomUtils.randomString(5)+System.currentTimeMillis();
+        //计算过期时间
         Calendar cal = Calendar.getInstance();
         Date currentTime = new Date(System.currentTimeMillis());
         cal.setTime(currentTime);
         cal.add(Calendar.DATE, clientKey.getDuration());
+        //存储仅数据库
         clientKey.setEffectiveTime(cal.getTime());
-        clientKey.setBkey(key);
-        clientKey.setWkfpath(fpath);
+        clientKey.setBlackKey(key);
+        clientKey.setEncKfpath(encfpath);
+        clientKey.setDecKfpath(decfpath);
         clientKey.setPass(pass);
         clientKeyService.updateClientKey(clientKey.getId(), clientKey);
     }
@@ -50,13 +72,18 @@ public class KeyDistributionController {
         if(!clientKey.getVaild()) {
             return null;
         }
-        if(clientKey.getWkfpath()!=null){
+        if(clientKey.getEncKfpath()!=null){
             //白盒密钥表存在
             Date currentTime = new Date(System.currentTimeMillis());
             if(currentTime.compareTo(clientKey.getEffectiveTime()) >0){
                 //密钥过期，更新密钥
-                String oldKfpath = clientKey.getWkfpath();
+                String oldKfpath = clientKey.getEncKfpath();
                 File oldkfile = new File(oldKfpath);
+                if(oldkfile.exists()){
+                    oldkfile.delete();
+                }
+                oldKfpath = clientKey.getDecKfpath();
+                oldkfile = new File(oldKfpath);
                 if(oldkfile.exists()){
                     oldkfile.delete();
                 }
@@ -93,7 +120,7 @@ public class KeyDistributionController {
         Map check = judgeKeyExitAndGenKey(clientKey);
         if(check == null)
             return JSONResult.error(401, "身份序列为"+clientKey.getSerial()+"的客户端授权失效");
-        ret.put("key", clientKey.getBkey());
+        ret.put("key", clientKey.getBlackKey());
         return JSONResult.ok(ret);
     }
 
@@ -109,13 +136,11 @@ public class KeyDistributionController {
             judgeKeyExitAndGenKey(it);
             Map<String, String> one = new HashMap<>();
             one.put("ClientSerial", it.getSerial());
-            one.put("key", it.getBkey());
+            one.put("key", it.getBlackKey());
             ret.add(one);
         }
         return JSONResult.ok(ret);
     }
-
-
 
     @GetMapping("/client/{serial}")
     public JSONResult clientAttachKey(@PathVariable("serial") String serial) throws FileNotFoundException {
@@ -127,12 +152,20 @@ public class KeyDistributionController {
             return JSONResult.ok(ret);
     }
 
-    @GetMapping("/download/{pass}")
+    @GetMapping("/download/{mode}/{pass}")
     public JSONResult fileDownLoad(HttpServletResponse response,
+                               @PathVariable("mode") String mode,
                                @PathVariable("pass") String pass){
         //根据密钥通行证找到相关密钥进行下载操作
         ClientKey clientKey = clientKeyService.findByPass(pass);
-        File file = new File(clientKey.getWkfpath());
+        File file;
+        if(mode.equals("enc")) {
+            file = new File(clientKey.getEncKfpath());
+        }else if(mode.equals("dec")){
+            file = new File(clientKey.getDecKfpath());
+        }else{
+            return JSONResult.error(400, "请注意：模式关键字为enc或dec！");
+        }
         if(!file.exists()){
             return JSONResult.error(404, "密钥文件生成出错，无法下载");
         }
@@ -154,6 +187,5 @@ public class KeyDistributionController {
             return JSONResult.error(404, "下载失败");
         }
         return JSONResult.ok("下载成功");
-
     }
 }
