@@ -14,9 +14,9 @@ public class WhiboxKeyUtils {
      * @param enc 选择加密或解密，1为加密，0为解密
      */
     public static WBCryptolib.WBCRYPTO_wbsm4_context genRandomKeyOfWBSM4(String key, int enc){
-        WBCryptolib.WBCRYPTO_wbsm4_context ret = WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_context_init();
+        WBCryptolib.WBCRYPTO_wbsm4_context ret = WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_context_init(enc, 1);
         byte[] byteKey = key.getBytes(StandardCharsets.UTF_8);
-        WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_gen_table_with_dummyrounds(ret, byteKey, byteKey.length, enc, 1);
+        WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_gen_table(ret, byteKey, byteKey.length);
         return ret;
     }
 

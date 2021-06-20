@@ -9,10 +9,7 @@ import com.scnu.whiboxkey.pksys.utils.RandomUtils;
 import com.scnu.whiboxkey.pksys.utils.WBCryptolib;
 import com.scnu.whiboxkey.pksys.utils.WhiboxKeyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -34,7 +31,7 @@ public class KeyDistributionController {
         String encfpath;
         String decfpath;
         //选择算法
-        if(clientKey.getWhiboxAlgName().equals("dummyround-SM4")) {
+        if(clientKey.getWhiboxAlgName().equals("Dummyround-WBSM4")) {
             //算法为dummyround-SM4
             //生成白盒加密表
             WBCryptolib.WBCRYPTO_wbsm4_context enc_ctx = WhiboxKeyUtils.genRandomKeyOfWBSM4(key, 1);
@@ -57,7 +54,7 @@ public class KeyDistributionController {
         Date currentTime = new Date(System.currentTimeMillis());
         cal.setTime(currentTime);
         cal.add(Calendar.DATE, clientKey.getDuration());
-        //存储仅数据库
+        //存储进数据库
         clientKey.setEffectiveTime(cal.getTime());
         clientKey.setBlackKey(key);
         clientKey.setEncKfpath(encfpath);
@@ -107,7 +104,7 @@ public class KeyDistributionController {
     @GetMapping("/server/{sserial}/{cserial}")
     public JSONResult serverAttachKey(@PathVariable("sserial") String sserial,
                                       @PathVariable("cserial") String cserial) throws FileNotFoundException {
-        Map<String, String> ret = new HashMap<>();
+        Map ret = new HashMap<>();
         ServerKey serverKey = serverKeyService.findBySerial(sserial);
         if(!serverKey.getVaild()){
             return JSONResult.error(401, "服务端授权过期或失效");
@@ -120,13 +117,14 @@ public class KeyDistributionController {
         Map check = judgeKeyExitAndGenKey(clientKey);
         if(check == null)
             return JSONResult.error(401, "身份序列为"+clientKey.getSerial()+"的客户端授权失效");
+        ret.put("clientId", clientKey.getId());
         ret.put("key", clientKey.getBlackKey());
         return JSONResult.ok(ret);
     }
 
     @GetMapping("/server/{sserial}")
     public JSONResult serverAttachKeyList(@PathVariable("sserial") String sserial) throws FileNotFoundException {
-        List<Map<String,String>> ret = new ArrayList<>();
+        List<Map> ret = new ArrayList<>();
         ServerKey serverKey = serverKeyService.findBySerial(sserial);
         if(!serverKey.getVaild()) {
             return JSONResult.error(401, "服务端授权过期或失效");
@@ -134,8 +132,9 @@ public class KeyDistributionController {
         Collection<ClientKey> keyList = serverKey.getClientKeyList();
         for (ClientKey it : keyList) {
             judgeKeyExitAndGenKey(it);
-            Map<String, String> one = new HashMap<>();
-            one.put("ClientSerial", it.getSerial());
+            Map one = new HashMap<>();
+            one.put("clientId", it.getId());
+            one.put("clientSerial", it.getSerial());
             one.put("key", it.getBlackKey());
             ret.add(one);
         }
@@ -186,6 +185,41 @@ public class KeyDistributionController {
         } catch (IOException e) {
             return JSONResult.error(404, "下载失败");
         }
-        return JSONResult.ok("下载成功");
+        return null;
+    }
+
+    @PostMapping("/update/{sserial}/{cserial}")
+    public JSONResult updateWhiboxKey(@PathVariable("sserial") String sserial,
+                                      @PathVariable("cserial") String cserial) throws FileNotFoundException {
+        Map ret = new HashMap<>();
+        ServerKey serverKey = serverKeyService.findBySerial(sserial);
+        if(serverKey == null){
+            return JSONResult.error(401, "未找到匹配的服务端");
+        }
+        if(!serverKey.getVaild()){
+            return JSONResult.error(401, "服务端授权过期或失效");
+        }
+        ClientKey clientKey = clientKeyService.findBySerial(cserial);
+        Collection<ClientKey> keyList = serverKey.getClientKeyList();
+        if(!keyList.contains(clientKey)){
+            return JSONResult.error(404, "未找到匹配的客户端");
+        }
+        if(!clientKey.getVaild()){
+            return JSONResult.error(401, "服务端授权过期或失效");
+        }
+        //更新密钥
+        String oldKfpath = clientKey.getEncKfpath();
+        File oldkfile = new File(oldKfpath);
+        if(oldkfile.exists()){
+            oldkfile.delete();
+        }
+        oldKfpath = clientKey.getDecKfpath();
+        oldkfile = new File(oldKfpath);
+        if(oldkfile.exists()){
+            oldkfile.delete();
+        }
+        genRandKeyAndUpdateDB(clientKey);
+        ret.put("pass", clientKey.getPass());
+        return JSONResult.ok(ret);
     }
 }
