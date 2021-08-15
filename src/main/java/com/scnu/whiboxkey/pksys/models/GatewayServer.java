@@ -2,14 +2,13 @@ package com.scnu.whiboxkey.pksys.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 @Entity
-@Table(name = "serverKey")
-public class ServerKey implements Serializable {
+@Table(name = "gatewayServer")
+public class GatewayServer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +16,7 @@ public class ServerKey implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //服务端唯一标识，用于验证客户端身份
+    //服务端唯一标识，用于验证服务端身份
     @Column(nullable = false, unique = true, length = 50)
     private String serial;
 
@@ -28,10 +27,10 @@ public class ServerKey implements Serializable {
 
     //服务端关联客户端关系
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name="server_client_key",
-            joinColumns={ @JoinColumn(name="server_key_id",referencedColumnName="id",unique = false)},
-            inverseJoinColumns={@JoinColumn(name="client_key_id",referencedColumnName="id")})
-    private Collection<ClientKey> clientKeyList = new ArrayList<ClientKey>();
+    @JoinTable(name="gateway_server_client",
+            joinColumns={ @JoinColumn(name="server_id",referencedColumnName="id")},
+            inverseJoinColumns={@JoinColumn(name="client_id",referencedColumnName="id")})
+    private Collection<GatewayClient> clientKeyList = new ArrayList<GatewayClient>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
@@ -39,7 +38,7 @@ public class ServerKey implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
-    public ServerKey() {
+    public GatewayServer() {
     }
 
     @PrePersist
@@ -50,18 +49,6 @@ public class ServerKey implements Serializable {
     @PreUpdate
     protected void onUpdate() {
         updateTime = new Date(System.currentTimeMillis());
-    }
-
-    @Override
-    public String toString() {
-        return "ServerKey{" +
-                "id=" + id +
-                ", serial='" + serial + '\'' +
-                ", vaild=" + vaild +
-                ", clientKeyList=" + clientKeyList +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
     }
 
     public Long getId() {
@@ -88,11 +75,11 @@ public class ServerKey implements Serializable {
         this.vaild = vaild;
     }
 
-    public Collection<ClientKey> getClientKeyList() {
+    public Collection<GatewayClient> getClientKeyList() {
         return clientKeyList;
     }
 
-    public void setClientKeyList(Collection<ClientKey> clientKeyList) {
+    public void setClientKeyList(Collection<GatewayClient> clientKeyList) {
         this.clientKeyList = clientKeyList;
     }
 
