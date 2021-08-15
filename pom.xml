@@ -55,12 +55,12 @@
     </dependencies>
 
     <build>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>resources</directory>-->
-<!--                <filtering>false</filtering>-->
-<!--            </resource>-->
-<!--        </resources>-->
+        <resources>
+            <resource>
+                <directory>resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

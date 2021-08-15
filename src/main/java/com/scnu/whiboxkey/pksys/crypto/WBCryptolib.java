@@ -1,4 +1,4 @@
-package com.scnu.whiboxkey.pksys.utils;
+package com.scnu.whiboxkey.pksys.crypto;
 
 import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface WBCryptolib extends Library {
 
-    WBCryptolib INSTANCE = (WBCryptolib) Native.loadLibrary("wbcrypto", WBCryptolib.class);
+    WBCryptolib INSTANCE = (WBCryptolib) Native.loadLibrary("libwbcrypto", WBCryptolib.class);
 
     /***********************************************sm3***********************************************/
     int WBCRYPTO_sm3(byte[] msg, int msglen, byte[] digest);
@@ -84,11 +84,11 @@ public interface WBCryptolib extends Library {
     int WBCRYPTO_sm4_encrypt(byte[] input, byte[] output, WBCryptolib.WBCRYPTO_sm4_context ctx);
     int WBCRYPTO_sm4_decrypt(byte[] input, byte[] output, WBCryptolib.WBCRYPTO_sm4_context ctx);
     int WBCRYPTO_sm4_cbc_encrypt(byte[] in, int inlen,
-                                 byte[] out, int outlen,
+                                 byte[] out, int max_olen, IntByReference use_olen,
                                  WBCryptolib.WBCRYPTO_sm4_context ctx,
                                  byte[] ivec);
     int WBCRYPTO_sm4_cbc_decrypt(byte[] in, int inlen,
-                                 byte[] out, int outlen,
+                                 byte[] out, int max_olen, IntByReference use_olen,
                                  WBCryptolib.WBCRYPTO_sm4_context ctx,
                                  byte[] ivec);
     WBCryptolib.WBCRYPTO_gcm_context WBCRYPTO_sm4_gcm_init(WBCryptolib.WBCRYPTO_sm4_context key);
@@ -119,11 +119,11 @@ public interface WBCryptolib extends Library {
     int WBCRYPTO_wbsm4_encrypt(byte[] input, byte[] output, WBCryptolib.WBCRYPTO_wbsm4_context ctx);
     int WBCRYPTO_wbsm4_decrypt(byte[] input, byte[] output, WBCryptolib.WBCRYPTO_wbsm4_context ctx);
     int WBCRYPTO_wbsm4_cbc_encrypt(byte[] in, int inlen,
-                                   byte[] out, int outlen,
+                                   byte[] out, int max_olen, IntByReference use_olen,
                                    WBCryptolib.WBCRYPTO_wbsm4_context ctx,
                                    byte[] ivec);
     int WBCRYPTO_wbsm4_cbc_decrypt(byte[] in, int inlen,
-                                   byte[] out, int outlen,
+                                   byte[] out, int max_olen, IntByReference use_olen,
                                    WBCryptolib.WBCRYPTO_wbsm4_context ctx,
                                    byte[] ivec);
     WBCryptolib.WBCRYPTO_gcm_context WBCRYPTO_wbsm4_gcm_init(WBCryptolib.WBCRYPTO_wbsm4_context key);

@@ -1,5 +1,6 @@
-package com.scnu.whiboxkey.pksys.utils;
+package com.scnu.whiboxkey.pksys.crypto;
 
+import com.scnu.whiboxkey.pksys.utils.RandomUtils;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -39,7 +40,6 @@ public class WhiboxKeyUtils {
         }
         String kfname = RandomUtils.randomString(5)+System.currentTimeMillis()+".whibox";
         String kfpath = keyBasePath + File.separator + kfname;
-//        System.out.println(kfpath);
         WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_key2file(ctx, kfpath);
         return kfpath;
     }
