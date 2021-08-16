@@ -90,7 +90,11 @@ public class Sm4EncCBC {
         byte[] key_byte = this.key.getBytes(StandardCharsets.UTF_8);
         byte[] ivbyte = ByteUtil.hexStrToByteArray(this.iv);
         byte[] tbyte = ByteUtil.hexStrToByteArray(this.text);
-        byte[] ans_byte = new byte[tbyte.length];
+        int tbyte_len = tbyte.length;
+        if(tbyte.length%16!=0){
+            tbyte_len = tbyte_len - (tbyte_len%16) + 16;
+        }
+        byte[] ans_byte = new byte[tbyte_len];
         IntByReference use_len = new IntByReference(0);
         WBCryptolib.WBCRYPTO_sm4_context sm4_context = WBCryptolib.INSTANCE.WBCRYPTO_sm4_context_init();
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_init_key(sm4_context, key_byte, key_byte.length);

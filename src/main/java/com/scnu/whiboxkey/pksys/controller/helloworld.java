@@ -39,15 +39,15 @@ public class helloworld {
     @GetMapping("/test/enc/algs")
     public JSONResult test_enc_algs(){
         //cbc
-        Sm4EncCBC cbc_enc = new Sm4EncCBC("1234567890abcdef", "000102030405060708090a0b0c0d0e0f", "0123456789abcdef");
+        Sm4EncCBC cbc_enc = new Sm4EncCBC("1234567890abcdef", "00", "000102030405060708090a0b0c0d0eff");
         cbc_enc.sm4EncCbcFun();
         String cipher1 = cbc_enc.getAns();
         System.out.println("sm4-cbc加密结果："+cipher1);
-        Sm4EncCBC cbc_dec = new Sm4EncCBC("1234567890abcdef", "000102030405060708090a0b0c0d0e0f", cipher1);
+        Sm4EncCBC cbc_dec = new Sm4EncCBC("1234567890abcdef", "00", cipher1);
         cbc_dec.sm4DecCbcFun();
         System.out.println("sm4-cbc解密结果："+cbc_dec.getAns());
         //gcm
-        Sm4EncGCM gcm_enc = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f","000102030405060708090a0b0c0d0e0f", "0123456789abcdef");
+        Sm4EncGCM gcm_enc = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f","000102030405060708090a0b0c0d0e0f", "000102030405060708090a0b0c0d0e0f");
         gcm_enc.sm4EncGcmFun();
         String cipher2 = gcm_enc.getAns();
         System.out.println("sm4-gcm加密结果："+cipher2);
@@ -56,12 +56,6 @@ public class helloworld {
         gcm_dec.sm4DecGcmFun();
         System.out.println("sm4-gcm解密结果："+gcm_dec.getAns());
         System.out.println("sm4-gcm解密tag值："+gcm_dec.getTag());
-//        byte[] key_byte = "123456789".getBytes(StandardCharsets.UTF_8);
-//        WBCryptolib.WBCRYPTO_sm4_context sm4_context = WBCryptolib.INSTANCE.WBCRYPTO_sm4_context_init();
-//        WBCryptolib.INSTANCE.WBCRYPTO_sm4_init_key(sm4_context, key_byte, key_byte.length);
-//        WBCryptolib.WBCRYPTO_wbsm4_context wbsm4_context = WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_context_init(1,1);
-//        WBCryptolib.INSTANCE.WBCRYPTO_wbsm4_gen_table(wbsm4_context, key_byte, key_byte.length);
-//        System.out.println("11111");
         return JSONResult.ok("ok");
     }
 }

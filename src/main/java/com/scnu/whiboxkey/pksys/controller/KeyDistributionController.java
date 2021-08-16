@@ -63,8 +63,6 @@ public class KeyDistributionController {
         cal.setTime(currentTime);
         cal.add(Calendar.DATE, whiboxKey.getDuration());
         String encKey = SM4EncKey.KeystoreSM4EncKey(key);
-        System.out.println("密钥为："+key);
-        System.out.println("加密后密钥为："+encKey);
         //存储进数据库
         whiboxKey.setBlackKey(encKey);
         whiboxKey.setEncKfpath(encfpath);
@@ -120,6 +118,11 @@ public class KeyDistributionController {
         if(!ByteUtil.isHexStr(communicationMsg.getIv())||!ByteUtil.isHexStr(communicationMsg.getText())){
             return JSONResult.error(400,"输入的消息或iv值需转换为16进制!");
         }
+        if(communicationMsg.getMode().equals("cbc")){
+            if(communicationMsg.getIv().length()!=32){
+                return JSONResult.error(400,"cbc模式的iv值需转换为16bytes长度的16进制数!");
+            }
+        }
         Map ret=new HashMap<>();
         //查询服务端
         GatewayServer gatewayServer = serverKeyService.findBySerial(sserial);
@@ -151,23 +154,29 @@ public class KeyDistributionController {
         //查询对应密钥
         WhiboxKey whiboxKey=null;
         Collection<WhiboxKey> whiboxKeyCollection = gatewayClient.getWhiboxKeyList();
+        Boolean upDown;
+        if(communicationMsg.getUpdown().equals("up"))
+            upDown = true;
+        else if(communicationMsg.getUpdown().equals("down"))
+            upDown = false;
+        else
+            return JSONResult.error(400, "请注意：上下行密钥参数为up或down！");
         for(WhiboxKey it: whiboxKeyCollection) {
-            if (it.getUpOrDown() == communicationMsg.getUpdown().equals("up")) {
+            if (it.getUpOrDown() == upDown) {
                 whiboxKey = it;
                 break;
             }
-            else if(it.getUpOrDown() == communicationMsg.getUpdown().equals("down")) {
+            else if(it.getUpOrDown() == upDown) {
                 whiboxKey = it;
                 break;
             }
         }
-        if(whiboxKey == null)
-            return JSONResult.error(400, "请注意：上下行密钥参数为up或down！");
         judgeKeyLegalAndGenKey(whiboxKey);
         //获取当前黑盒密钥
         String key=SM4EncKey.KeystoreSM4DecKey(whiboxKey.getBlackKey());
-        //cbc模式
+        //进行加解密操作
         if(communicationMsg.getMode().equals("cbc")){
+            //cbc模式
             Sm4EncCBC sm4EncCBC=new Sm4EncCBC(key, communicationMsg.getIv(), communicationMsg.getText());
             if(communicationMsg.getEnc().equals("enc")){
                 sm4EncCBC.sm4EncCbcFun();
@@ -178,6 +187,7 @@ public class KeyDistributionController {
             }
             ret.put("answer", sm4EncCBC.getAns());
         }else if (communicationMsg.getMode().equals("gcm")){
+            //gcm模式
             Sm4EncGCM sm4EncGCM;
             if (communicationMsg.getAad()!=null)
                 sm4EncGCM=new Sm4EncGCM(key, communicationMsg.getIv(), communicationMsg.getText());
@@ -208,18 +218,23 @@ public class KeyDistributionController {
         }
         WhiboxKey whiboxKey=null;
         Collection<WhiboxKey> whiboxKeyCollection = gatewayClient.getWhiboxKeyList();
+        Boolean upDown;
+        if(upOrDown.equals("up"))
+            upDown = true;
+        else if(upOrDown.equals("down"))
+            upDown = false;
+        else
+            return JSONResult.error(400, "请注意：上下行密钥参数为up或down！");
         for(WhiboxKey it: whiboxKeyCollection) {
-            if (it.getUpOrDown() == upOrDown.equals("up")) {
+            if (it.getUpOrDown() == upDown) {
                 whiboxKey = it;
                 break;
             }
-            else if(it.getUpOrDown() == upOrDown.equals("down")) {
+            else if(it.getUpOrDown() == upDown) {
                 whiboxKey = it;
                 break;
             }
         }
-        if(whiboxKey == null)
-            return JSONResult.error(400, "请注意：上下行密钥参数为up或down！");
         ret = judgeKeyLegalAndGenKey(whiboxKey);
         return JSONResult.ok(ret);
     }
@@ -259,5 +274,25 @@ public class KeyDistributionController {
             return JSONResult.error(404, "下载失败");
         }
         return null;
+    }
+
+    @PutMapping("/wk/update/{id}")
+    public JSONResult updateWhiboxKey(@PathVariable("id") Long id) throws FileNotFoundException {
+        WhiboxKey whiboxKey = whiboxKeyService.findById(id);
+        if (whiboxKey.getEncKfpath() != null) {
+                //密钥过期，更新密钥
+                String oldKfpath = whiboxKey.getEncKfpath();
+                File oldkfile = new File(oldKfpath);
+                if (oldkfile.exists()) {
+                    oldkfile.delete();
+                }
+                oldKfpath = whiboxKey.getDecKfpath();
+                oldkfile = new File(oldKfpath);
+                if (oldkfile.exists()) {
+                    oldkfile.delete();
+                }
+        }
+        genRandKeyAndUpdateDB(whiboxKey);
+        return JSONResult.ok(whiboxKeyService.findById(id));
     }
 }
