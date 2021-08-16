@@ -148,8 +148,8 @@ public class KeyDistributionController {
             return JSONResult.error(401, "客户端授权失效");
         }
         //算法待扩展
-        if(!communicationMsg.getAlgorithm().equals("Dummyround-WBSM4")){
-            return JSONResult.error(400, "目前仅支持算法：Dummyround-WBSM4");
+        if(!communicationMsg.getAlgorithm().equals("WBSM4")){
+            return JSONResult.error(400, "目前仅支持算法：WBSM4");
         }
         //查询对应密钥
         WhiboxKey whiboxKey=null;
