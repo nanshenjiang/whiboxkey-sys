@@ -1,6 +1,6 @@
 package com.scnu.whiboxkey.pksys.service.impl;
 
-import com.scnu.whiboxkey.pksys.models.GatewayClient;
+import com.scnu.whiboxkey.pksys.models.KeyMsg;
 import com.scnu.whiboxkey.pksys.models.WhiboxKey;
 import com.scnu.whiboxkey.pksys.repository.WhiboxKeyRepository;
 import com.scnu.whiboxkey.pksys.service.WhiboxKeyService;
@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Service
 public class WhiboxKeyServiceImpl implements WhiboxKeyService {
+
     @Autowired
     private WhiboxKeyRepository whiboxKeyRepository;
 
@@ -43,18 +44,20 @@ public class WhiboxKeyServiceImpl implements WhiboxKeyService {
 
     @Override
     public void deleteById(Long id) {
-        WhiboxKey whiboxKey = this.findById(id);
-        String oldKfpath = whiboxKey.getEncKfpath();
-        File oldkfile = new File(oldKfpath);
-        if(oldkfile.exists()){
-            oldkfile.delete();
-        }
-        oldKfpath = whiboxKey.getDecKfpath();
-        oldkfile = new File(oldKfpath);
-        if(oldkfile.exists()){
-            oldkfile.delete();
+        WhiboxKey wk = this.findById(id);
+        if (wk.getKeyFpath() != null) {
+            String oldKfpath = wk.getKeyFpath();
+            File oldkfile = new File(oldKfpath);
+            if (oldkfile.exists()) {
+                oldkfile.delete();
+            }
         }
         whiboxKeyRepository.deleteById(id);
+    }
+
+    @Override
+    public WhiboxKey findByIdAndVersion(Long id, String version) {
+        return whiboxKeyRepository.findByIdAndVersion(id, version);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.scnu.whiboxkey.pksys.service;
 
+import com.scnu.whiboxkey.pksys.models.GatewayClient;
 import com.scnu.whiboxkey.pksys.models.GatewayServer;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface GatewayServerService {
     void deleteById(Long id);
 
     GatewayServer findBySerial(String serial);
+
+    GatewayClient findByClientSerial(Long id, String serial);
 }

@@ -63,4 +63,18 @@ public class GatewayServiceServiceImpl implements GatewayServerService {
     public GatewayServer findBySerial(String serial) {
         return serverKeyRepository.findBySerial(serial);
     }
+
+    @Override
+    public GatewayClient findByClientSerial(Long id, String serial) {
+        GatewayServer gatewayServer = this.findById(id);
+        GatewayClient gatewayClient = null;
+        Collection<GatewayClient> ckCollection = gatewayServer.getClientKeyList();
+        for(GatewayClient it: ckCollection){
+            if(it.getSerial().equals(serial)) {
+                gatewayClient = it;
+                break;
+            }
+        }
+        return gatewayClient;
+    }
 }

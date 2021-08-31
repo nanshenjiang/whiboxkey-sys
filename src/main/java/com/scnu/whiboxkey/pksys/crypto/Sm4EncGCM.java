@@ -16,9 +16,6 @@ public class Sm4EncGCM {
     //初始值iv，需为16进制String
     private String iv;
 
-    //附加值，需为16进制String
-    private String aad;
-
     //需要处理的信息，需为16进制String
     private String text;
 
@@ -32,14 +29,6 @@ public class Sm4EncGCM {
         this.key = key;
         this.iv = iv;
         this.text = text;
-        this.aad = null;
-    }
-
-    public Sm4EncGCM(String key, String iv, String aad, String text) {
-        this.key = key;
-        this.iv = iv;
-        this.aad = aad;
-        this.text = text;
     }
 
     /**
@@ -48,9 +37,6 @@ public class Sm4EncGCM {
     public void sm4EncGcmFun(){
         byte[] key_byte = this.key.getBytes(StandardCharsets.UTF_8);
         byte[] ivbyte = ByteUtil.hexStrToByteArray(this.iv);
-        byte[] aadbyte = null;
-        if(this.aad!=null)
-            aadbyte = ByteUtil.hexStrToByteArray(this.aad);
         byte[] tbyte = ByteUtil.hexStrToByteArray(this.text);
         byte[] ans_byte = new byte[tbyte.length];
         byte[] tag = new byte[16];
@@ -58,8 +44,6 @@ public class Sm4EncGCM {
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_init_key(sm4_context, key_byte, key_byte.length);
         WBCryptolib.WBCRYPTO_gcm_context gcm_ctx = WBCryptolib.INSTANCE.WBCRYPTO_sm4_gcm_init(sm4_context);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_setiv(gcm_ctx, ivbyte, ivbyte.length);
-        if(aadbyte!=null)
-            WBCryptolib.INSTANCE.WBCRYPTO_gcm_aad(gcm_ctx, aadbyte, aadbyte.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_encrypt(gcm_ctx, tbyte, tbyte.length, ans_byte, ans_byte.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_finish(gcm_ctx, tag, tag.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_free(gcm_ctx);
@@ -74,9 +58,6 @@ public class Sm4EncGCM {
     public void sm4DecGcmFun(){
         byte[] key_byte = this.key.getBytes(StandardCharsets.UTF_8);
         byte[] ivbyte = ByteUtil.hexStrToByteArray(this.iv);
-        byte[] aadbyte = null;
-        if(this.aad!=null)
-            aadbyte = ByteUtil.hexStrToByteArray(this.aad);
         byte[] tbyte = ByteUtil.hexStrToByteArray(this.text);
         byte[] ans_byte = new byte[tbyte.length];
         byte[] tag = new byte[16];
@@ -84,8 +65,6 @@ public class Sm4EncGCM {
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_init_key(sm4_context, key_byte, key_byte.length);
         WBCryptolib.WBCRYPTO_gcm_context gcm_ctx = WBCryptolib.INSTANCE.WBCRYPTO_sm4_gcm_init(sm4_context);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_setiv(gcm_ctx, ivbyte, ivbyte.length);
-        if(aadbyte!=null)
-            WBCryptolib.INSTANCE.WBCRYPTO_gcm_aad(gcm_ctx, aadbyte, aadbyte.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_decrypt(gcm_ctx, tbyte, tbyte.length, ans_byte, ans_byte.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_finish(gcm_ctx, tag, tag.length);
         WBCryptolib.INSTANCE.WBCRYPTO_gcm_free(gcm_ctx);
@@ -108,14 +87,6 @@ public class Sm4EncGCM {
 
     public void setIv(String iv) {
         this.iv = iv;
-    }
-
-    public String getAad() {
-        return aad;
-    }
-
-    public void setAad(String aad) {
-        this.aad = aad;
     }
 
     public String getText() {

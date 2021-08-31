@@ -38,7 +38,7 @@ public class GatewayClient implements Serializable {
     @JoinTable(name="client_whibox_key",
             joinColumns={ @JoinColumn(name="client_key_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="whibox_key_id",referencedColumnName="id")})
-    private Collection<WhiboxKey> whiboxKeyList = new ArrayList<WhiboxKey>();
+    private Collection<KeyMsg> keyMsgList = new ArrayList<KeyMsg>();
 
     public GatewayClient() {
     }
@@ -93,11 +93,11 @@ public class GatewayClient implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Collection<WhiboxKey> getWhiboxKeyList() {
-        return whiboxKeyList;
+    public Collection<KeyMsg> getWhiboxKeyList() {
+        return keyMsgList;
     }
 
-    public void setWhiboxKeyList(Collection<WhiboxKey> whiboxKeyList) {
-        this.whiboxKeyList = whiboxKeyList;
+    public void setWhiboxKeyList(Collection<KeyMsg> keyMsgList) {
+        this.keyMsgList = keyMsgList;
     }
 }

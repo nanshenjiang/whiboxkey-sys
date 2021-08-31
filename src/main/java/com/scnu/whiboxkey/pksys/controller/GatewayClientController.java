@@ -1,10 +1,9 @@
 package com.scnu.whiboxkey.pksys.controller;
 
 import com.scnu.whiboxkey.pksys.models.GatewayClient;
-import com.scnu.whiboxkey.pksys.models.GatewayServer;
-import com.scnu.whiboxkey.pksys.models.WhiboxKey;
+import com.scnu.whiboxkey.pksys.models.KeyMsg;
 import com.scnu.whiboxkey.pksys.service.GatewayClientService;
-import com.scnu.whiboxkey.pksys.service.WhiboxKeyService;
+import com.scnu.whiboxkey.pksys.service.KeyMsgService;
 import com.scnu.whiboxkey.pksys.utils.JSONResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,7 @@ public class GatewayClientController {
     private GatewayClientService gatewayClientService;
 
     @Autowired
-    private WhiboxKeyService whiboxKeyService;
+    private KeyMsgService keyMsgService;
 
     @GetMapping("/client/list")
     public JSONResult findAllOfClientKey() {
@@ -49,10 +48,10 @@ public class GatewayClientController {
     @PutMapping("/client/relation/key/{cid}/{kid}")
     public JSONResult buildRelationBTServerAndClient(@PathVariable("cid") Long cid,
                                                      @PathVariable("kid") Long kid) {
-        WhiboxKey wk = whiboxKeyService.findById(kid);
+        KeyMsg wk = keyMsgService.findById(kid);
         GatewayClient gatewayClient = gatewayClientService.findById(cid);
-        Collection<WhiboxKey> whiboxKeyCollection = gatewayClient.getWhiboxKeyList();
-        for(WhiboxKey it: whiboxKeyCollection) {
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        for(KeyMsg it: keyMsgCollection) {
             if (it.getUpOrDown() == wk.getUpOrDown())
                 return JSONResult.error(403,"仅能存在一个上行密钥或下行密钥");
         }

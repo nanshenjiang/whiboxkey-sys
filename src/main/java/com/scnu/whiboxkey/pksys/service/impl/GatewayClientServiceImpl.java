@@ -1,11 +1,10 @@
 package com.scnu.whiboxkey.pksys.service.impl;
 
 import com.scnu.whiboxkey.pksys.models.GatewayClient;
-import com.scnu.whiboxkey.pksys.models.WhiboxKey;
+import com.scnu.whiboxkey.pksys.models.KeyMsg;
 import com.scnu.whiboxkey.pksys.repository.GatewayClientRepository;
-import com.scnu.whiboxkey.pksys.repository.WhiboxKeyRepository;
 import com.scnu.whiboxkey.pksys.service.GatewayClientService;
-import com.scnu.whiboxkey.pksys.service.WhiboxKeyService;
+import com.scnu.whiboxkey.pksys.service.KeyMsgService;
 import com.scnu.whiboxkey.pksys.utils.BeanUtilsExt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     private GatewayClientRepository clientKeyRepository;
 
     @Autowired
-    private WhiboxKeyService whiboxKeyService;
+    private KeyMsgService keyMsgService;
 
     @Override
     public List<GatewayClient> findAll() {
@@ -53,9 +52,9 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     @Transactional
     public void deleteById(Long id) {
         GatewayClient clientKey = this.findById(id);
-        Collection<WhiboxKey> whiboxKeyCollection = clientKey.getWhiboxKeyList();
-        for(WhiboxKey it: whiboxKeyCollection){
-            whiboxKeyService.deleteById(it.getId());
+        Collection<KeyMsg> keyMsgCollection = clientKey.getWhiboxKeyList();
+        for(KeyMsg it: keyMsgCollection){
+            keyMsgService.deleteById(it.getId());
         }
         clientKeyRepository.deleteById(id);
     }
@@ -63,5 +62,33 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     @Override
     public GatewayClient findBySerial(String serial) {
         return clientKeyRepository.findBySerial(serial);
+    }
+
+    @Override
+    public KeyMsg getUpKey(Long id) {
+        GatewayClient gatewayClient = this.findById(id);
+        KeyMsg keyMsg =null;
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        for(KeyMsg it: keyMsgCollection) {
+            if(it.getUpOrDown()) {
+                keyMsg = it;
+                break;
+            }
+        }
+        return keyMsg;
+    }
+
+    @Override
+    public KeyMsg getDownKey(Long id) {
+        GatewayClient gatewayClient = this.findById(id);
+        KeyMsg keyMsg =null;
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        for(KeyMsg it: keyMsgCollection) {
+            if(!it.getUpOrDown()) {
+                keyMsg = it;
+                break;
+            }
+        }
+        return keyMsg;
     }
 }

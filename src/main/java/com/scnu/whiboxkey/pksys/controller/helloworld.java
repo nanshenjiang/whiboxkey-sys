@@ -47,12 +47,12 @@ public class helloworld {
         cbc_dec.sm4DecCbcFun();
         System.out.println("sm4-cbc解密结果："+cbc_dec.getAns());
         //gcm
-        Sm4EncGCM gcm_enc = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f","000102030405060708090a0b0c0d0e0f", "000102030405060708090a0b0c0d0e0f");
+        Sm4EncGCM gcm_enc = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f", "000102030405060708090a0b0c0d0e0f");
         gcm_enc.sm4EncGcmFun();
         String cipher2 = gcm_enc.getAns();
         System.out.println("sm4-gcm加密结果："+cipher2);
         System.out.println("sm4-gcm加密tag值："+gcm_enc.getTag());
-        Sm4EncGCM gcm_dec = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f","000102030405060708090a0b0c0d0e0f", cipher2);
+        Sm4EncGCM gcm_dec = new Sm4EncGCM("1234567890abcdef", "000102030405060708090a0b0c0d0e0f", cipher2);
         gcm_dec.sm4DecGcmFun();
         System.out.println("sm4-gcm解密结果："+gcm_dec.getAns());
         System.out.println("sm4-gcm解密tag值："+gcm_dec.getTag());

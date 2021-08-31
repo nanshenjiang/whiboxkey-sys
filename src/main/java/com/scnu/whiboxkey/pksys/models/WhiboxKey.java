@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "whiboxKey")
-public class WhiboxKey implements Serializable  {
+public class WhiboxKey implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -14,38 +14,25 @@ public class WhiboxKey implements Serializable  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //上行密钥为true，下行密钥为false
-    @Column(nullable = false)
-    @org.hibernate.annotations.Type(type = "boolean")
-    private Boolean upOrDown;
-
     //黑盒密钥，加密后存储
     @Column(length = 50)
     private String blackKey;
 
-    //白盒加密算法名字
-    @Column(nullable = false, length = 50)
-    private String whiboxAlgName;
-
-    //白盒加密密钥表，以文件形式存储
-    @Column(length = 254)
-    private String encKfpath;
-
-    //白盒解密密钥表，以文件形式存储
-    @Column(length = 254)
-    private String decKfpath;
-
-    //白盒密钥表有效持续的时间（单位：天）
+    //版本号
     @Column(nullable = false)
-    private Integer duration;
+    private Long version;
 
-    //白盒密钥表有效至时间
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date effectiveTime;
+    //白盒密钥表，以文件形式存储，存储文件路径
+    @Column(length = 254)
+    private String keyFpath;
 
     //白盒密钥表的通行证，含该通行证才能下载密钥表
     @Column(length = 50, unique = true)
     private String pass;
+
+    //白盒密钥表有效至时间
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date effectiveTime;
 
     //创建时间
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,20 +52,23 @@ public class WhiboxKey implements Serializable  {
         updateTime = new Date(System.currentTimeMillis());
     }
 
+    public WhiboxKey() {
+    }
+
+    public WhiboxKey(String blackKey, Long version, String keyFpath, String pass, Date effectiveTime) {
+        this.blackKey = blackKey;
+        this.version = version;
+        this.keyFpath = keyFpath;
+        this.pass = pass;
+        this.effectiveTime = effectiveTime;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Boolean getUpOrDown() {
-        return upOrDown;
-    }
-
-    public void setUpOrDown(Boolean upOrDown) {
-        this.upOrDown = upOrDown;
     }
 
     public String getBlackKey() {
@@ -89,44 +79,20 @@ public class WhiboxKey implements Serializable  {
         this.blackKey = blackKey;
     }
 
-    public String getWhiboxAlgName() {
-        return whiboxAlgName;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setWhiboxAlgName(String whiboxAlgName) {
-        this.whiboxAlgName = whiboxAlgName;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
-    public String getEncKfpath() {
-        return encKfpath;
+    public String getKeyFpath() {
+        return keyFpath;
     }
 
-    public void setEncKfpath(String encKfpath) {
-        this.encKfpath = encKfpath;
-    }
-
-    public String getDecKfpath() {
-        return decKfpath;
-    }
-
-    public void setDecKfpath(String decKfpath) {
-        this.decKfpath = decKfpath;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public Date getEffectiveTime() {
-        return effectiveTime;
-    }
-
-    public void setEffectiveTime(Date effectiveTime) {
-        this.effectiveTime = effectiveTime;
+    public void setKeyFpath(String keyFpath) {
+        this.keyFpath = keyFpath;
     }
 
     public String getPass() {
@@ -135,6 +101,14 @@ public class WhiboxKey implements Serializable  {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public Date getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(Date effectiveTime) {
+        this.effectiveTime = effectiveTime;
     }
 
     public Date getCreateTime() {
