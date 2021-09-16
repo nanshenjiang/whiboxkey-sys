@@ -8,6 +8,10 @@ import com.scnu.whiboxkey.pksys.service.KeyMsgService;
 import com.scnu.whiboxkey.pksys.utils.BeanUtilsExt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,6 +26,13 @@ public class GatewayClientServiceImpl implements GatewayClientService {
 
     @Autowired
     private KeyMsgService keyMsgService;
+
+    @Override
+    public Page<GatewayClient> findGCNoCriteria(Integer page, Integer size) {
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return clientKeyRepository.findAll(pageable);
+    }
 
     @Override
     public List<GatewayClient> findAll() {

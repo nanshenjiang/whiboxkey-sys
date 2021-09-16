@@ -38,9 +38,16 @@ public class GatewayClient implements Serializable {
     @JoinTable(name="client_whibox_key",
             joinColumns={ @JoinColumn(name="client_key_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="whibox_key_id",referencedColumnName="id")})
-    private Collection<KeyMsg> keyMsgList = new ArrayList<KeyMsg>();
+//    private Collection<KeyMsg> keyMsgList = new ArrayList<KeyMsg>();
+    private Collection<KeyMsg> keyMsgList;
 
     public GatewayClient() {
+    }
+
+    public GatewayClient(String serial, Boolean vaild) {
+        this.serial = serial;
+        this.vaild = vaild;
+        this.keyMsgList = new ArrayList<KeyMsg>();
     }
 
     @PrePersist

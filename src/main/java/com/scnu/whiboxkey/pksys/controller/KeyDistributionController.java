@@ -158,6 +158,71 @@ public class KeyDistributionController {
         return JSONResult.ok(ret);
     }
 
+    @GetMapping("/server/dec/{sserial}/{cserial}/{version}")
+    public JSONResult serverDecDataGet(@PathVariable("sserial") String sserial,
+                                    @PathVariable("cserial") String cserial,
+                                    @PathVariable("version") Long version,
+                                    @RequestParam("algorithm") String getAlgorithm,
+                                    @RequestParam("iv") String getIv,
+                                    @RequestParam("mode") String getMode,
+                                    @RequestParam("text") String getText) {
+        if(!ByteUtil.isHexStr(getIv)||!ByteUtil.isHexStr(getText)){
+            return JSONResult.error(400,"输入的消息或iv值需转换为16进制!");
+        }
+        if(getMode.equals("cbc")){
+            if(getIv.length()!=32){
+                return JSONResult.error(400,"cbc模式的iv值需转换为16bytes长度的16进制数!");
+            }
+        }
+        Map ret=new HashMap<>();
+        //查询服务端
+        GatewayServer gatewayServer = gatewayServerService.findBySerial(sserial);
+        if(gatewayServer == null){
+            return JSONResult.error(401, "未找到匹配的服务端");
+        }
+        if(!gatewayServer.getVaild()) {
+            return JSONResult.error(401, "服务端授权失效");
+        }
+        //查询客户端
+        GatewayClient gatewayClient = gatewayServerService.findByClientSerial(gatewayServer.getId(), cserial);
+        if(gatewayClient == null){
+            return JSONResult.error(401, "未找到匹配的客户端");
+        }
+        if(!gatewayClient.getVaild()) {
+            return JSONResult.error(401, "客户端授权失效");
+        }
+        //算法待扩展
+        if(!getAlgorithm.equals("WBSM4")){
+            return JSONResult.error(400, "目前仅支持算法：WBSM4");
+        }
+        //查询对应密钥
+        KeyMsg keyMsg = gatewayClientService.getUpKey(gatewayClient.getId());
+        WhiboxKey whiboxKey = keyMsgService.findByVersion(keyMsg.getId(), version);
+        if(whiboxKey == null){
+            return JSONResult.error(401, "版本错误，未查找到密钥！");
+        }
+        //获取当前黑盒密钥
+        String key=SM4EncKey.KeystoreSM4DecKey(whiboxKey.getBlackKey());
+        System.out.println("解密密钥: "+key);
+        //进行加解密操作
+        if(getMode.equals("cbc")){
+            //cbc模式
+            Sm4EncCBC sm4EncCBC=new Sm4EncCBC(key, getIv, getText);
+            sm4EncCBC.sm4DecCbcFun();
+            ret.put("answer", sm4EncCBC.getAns());
+        }else if (getMode.equals("gcm")){
+            //gcm模式
+            Sm4EncGCM sm4EncGCM = new Sm4EncGCM(key, getIv, getText);
+            sm4EncGCM.sm4DecGcmFun();
+            ret.put("answer", sm4EncGCM.getAns());
+            ret.put("tag", sm4EncGCM.getTag());
+        }else {
+            return JSONResult.error(400, "请注意：加密模式参数为cbc或gcm");
+        }
+        ret.put("version", whiboxKey.getVersion());
+        return JSONResult.ok(ret);
+    }
+
     @PostMapping("/server/dec/{sserial}/{cserial}/{version}")
     public JSONResult serverDecData(@PathVariable("sserial") String sserial,
                                     @PathVariable("cserial") String cserial,
@@ -281,5 +346,12 @@ public class KeyDistributionController {
             return JSONResult.error(404, "下载失败");
         }
         return null;
+    }
+
+    @PutMapping("/wk/update/{id}")
+    public JSONResult uploadWhiboxKey(@PathVariable("id") Long id) throws FileNotFoundException {
+        KeyMsg keyMsg = keyMsgService.findById(id);
+        WhiboxKey retWk = judgeKeyLegalAndGenKey(keyMsg);
+        return JSONResult.ok(retWk);
     }
 }

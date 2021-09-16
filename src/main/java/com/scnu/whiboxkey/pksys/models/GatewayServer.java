@@ -30,7 +30,8 @@ public class GatewayServer implements Serializable {
     @JoinTable(name="gateway_server_client",
             joinColumns={ @JoinColumn(name="server_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="client_id",referencedColumnName="id")})
-    private Collection<GatewayClient> clientKeyList = new ArrayList<GatewayClient>();
+//    private Collection<GatewayClient> clientKeyList = new ArrayList<GatewayClient>();
+      private Collection<GatewayClient> clientKeyList;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
@@ -99,3 +100,4 @@ public class GatewayServer implements Serializable {
         this.updateTime = updateTime;
     }
 }
+

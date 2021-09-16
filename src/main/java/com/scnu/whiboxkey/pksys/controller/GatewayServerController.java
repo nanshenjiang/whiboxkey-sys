@@ -6,13 +6,14 @@ import com.scnu.whiboxkey.pksys.service.GatewayClientService;
 import com.scnu.whiboxkey.pksys.service.GatewayServerService;
 import com.scnu.whiboxkey.pksys.utils.JSONResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @RestController
-@RequestMapping("/whibox/manage")
+@RequestMapping("/whibox/manage/server")
+@CrossOrigin
 public class GatewayServerController {
     @Autowired
     private GatewayServerService gatewayServerService;
@@ -20,32 +21,68 @@ public class GatewayServerController {
     @Autowired
     private GatewayClientService gatewayClientService;
 
-    @GetMapping("/server/list")
+    @GetMapping("/query")
+    public JSONResult findServerKeyQuery(@RequestParam(value = "index", defaultValue = "0") Integer index,
+                                  @RequestParam(value = "size", defaultValue = "10") Integer size){
+        Page<GatewayServer> gatewayServerPage = gatewayServerService.findGSNoCriteria(index, size);
+        List<GatewayServer> gatewayServerList = gatewayServerPage.getContent();
+        List<Map<String,Object>> gsMapList = new ArrayList<>();
+        Map<String,Object> ret = new HashMap<>();
+        for(GatewayServer gs:gatewayServerList){
+            Map<String,Object> gsMap = new HashMap<>();
+            gsMap.put("id", gs.getId());
+            gsMap.put("serial", gs.getSerial());
+            gsMap.put("vaild", gs.getVaild());
+            gsMap.put("date", gs.getCreateTime());
+            gsMap.put("connectNum", gs.getClientKeyList().size());
+            gsMapList.add(gsMap);
+        }
+        ret.put("list", gsMapList);
+        ret.put("index", gatewayServerPage.getNumber());
+        ret.put("size", gatewayServerPage.getSize());
+        ret.put("total", gatewayServerPage.getTotalPages());
+        return JSONResult.ok(ret);
+    }
+
+    @GetMapping("/list")
     public JSONResult findAllOfServerKey() {
         List<GatewayServer> gatewayServerList = gatewayServerService.findAll();
         return JSONResult.ok(gatewayServerList);
     }
 
-    @GetMapping("/server/{id}")
+    @GetMapping("/serial/list")
+    public JSONResult findAllOfServerKeyAndSerial() {
+        List<GatewayServer> gatewayServerList = gatewayServerService.findAll();
+        List<Map<String,Object>> gsMapList = new ArrayList<>();
+        for(GatewayServer gs:gatewayServerList){
+            Map<String,Object> gsMap = new HashMap<>();
+            gsMap.put("value", gs.getId());
+            gsMap.put("label", gs.getSerial());
+            gsMapList.add(gsMap);
+        }
+        return JSONResult.ok(gsMapList);
+    }
+
+    @GetMapping("/{id}")
     public JSONResult findOneOfServerKey(@PathVariable("id") Long id) {
         GatewayServer gatewayServer = gatewayServerService.findById(id);
         return JSONResult.ok(gatewayServer);
     }
 
-    @PostMapping("/server")
+    @PostMapping
     public JSONResult createServerKey(@RequestBody GatewayServer gatewayServer) {
         GatewayServer afgatewayServer = gatewayServerService.save(gatewayServer);
         return JSONResult.ok(afgatewayServer);
     }
 
-    @PutMapping("/server/{id}")
+    @PutMapping("/{id}")
     public JSONResult updateServerKey(@PathVariable("id") Long id,
                                       @RequestBody GatewayServer gatewayServer) {
         GatewayServer afgatewayServer = gatewayServerService.update(id, gatewayServer);
         return JSONResult.ok(afgatewayServer);
     }
 
-    @PutMapping("/server/relation/client/{sid}/{cid}")
+    @PutMapping("/relation/client/{sid}/{cid}")
     public JSONResult buildRelationBTServerAndClient(@PathVariable("sid") Long sid,
                                                      @PathVariable("cid") Long cid) {
         GatewayClient gc = gatewayClientService.findById(cid);
@@ -55,7 +92,7 @@ public class GatewayServerController {
         return JSONResult.ok(afgatewayServer);
     }
 
-    @DeleteMapping("/server/{id}")
+    @DeleteMapping("/{id}")
     public JSONResult deleteServerKey(@PathVariable("id") Long id) {
         gatewayServerService .deleteById(id);
         return JSONResult.ok("删除成功");

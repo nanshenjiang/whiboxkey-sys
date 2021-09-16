@@ -8,6 +8,7 @@ import com.scnu.whiboxkey.pksys.service.GatewayServerService;
 import com.scnu.whiboxkey.pksys.utils.BeanUtilsExt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,6 +23,13 @@ public class GatewayServiceServiceImpl implements GatewayServerService {
 
     @Autowired
     private GatewayClientService clientKeyService;
+
+    @Override
+    public Page<GatewayServer> findGSNoCriteria(Integer page, Integer size) {
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable =PageRequest.of(page, size, sort);
+        return serverKeyRepository.findAll(pageable);
+    }
 
     @Override
     public List<GatewayServer> findAll() {
@@ -45,6 +53,7 @@ public class GatewayServiceServiceImpl implements GatewayServerService {
     public GatewayServer update(Long id, GatewayServer gatewayServer) {
         GatewayServer sk = this.findById(id);
         BeanUtils.copyProperties(gatewayServer, sk, BeanUtilsExt.getNullPropertyNames(gatewayServer));
+//        sk.setClientKeyList(gatewayServer.getClientKeyList());
         return serverKeyRepository.saveAndFlush(sk);
     }
 

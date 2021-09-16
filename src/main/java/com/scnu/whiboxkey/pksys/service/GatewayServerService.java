@@ -2,10 +2,14 @@ package com.scnu.whiboxkey.pksys.service;
 
 import com.scnu.whiboxkey.pksys.models.GatewayClient;
 import com.scnu.whiboxkey.pksys.models.GatewayServer;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface GatewayServerService {
+
+    Page<GatewayServer> findGSNoCriteria(Integer page,Integer size);
+
     List<GatewayServer> findAll();
 
     GatewayServer findById(Long id);

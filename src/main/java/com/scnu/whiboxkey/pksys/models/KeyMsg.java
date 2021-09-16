@@ -59,6 +59,12 @@ public class KeyMsg implements Serializable  {
     public KeyMsg() {
     }
 
+    public KeyMsg(Boolean upOrDown, String whiboxAlgName, Integer duration) {
+        this.upOrDown = upOrDown;
+        this.whiboxAlgName = whiboxAlgName;
+        this.duration = duration;
+    }
+
     public Long getId() {
         return id;
     }
