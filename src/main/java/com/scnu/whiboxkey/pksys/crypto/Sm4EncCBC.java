@@ -1,8 +1,6 @@
 package com.scnu.whiboxkey.pksys.crypto;
 
 import com.scnu.whiboxkey.pksys.utils.ByteUtil;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
 import java.nio.charset.StandardCharsets;
@@ -73,6 +71,8 @@ public class Sm4EncCBC {
         int tbyte_len = tbyte.length;
         if(tbyte.length%16!=0){
             tbyte_len = tbyte_len - (tbyte_len%16) + 16;
+        }else {
+            tbyte_len += 16;
         }
         byte[] ans_byte = new byte[tbyte_len];
         IntByReference use_len = new IntByReference(0);

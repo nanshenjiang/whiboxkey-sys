@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface WBCryptolib extends Library {
 
-    WBCryptolib INSTANCE = (WBCryptolib) Native.loadLibrary("libwbcrypto", WBCryptolib.class);
+    WBCryptolib INSTANCE = System.getProperty("os.name").toLowerCase().contains("linux")?
+            (WBCryptolib) Native.loadLibrary("wbcrypto", WBCryptolib.class):
+            System.getProperty("os.name").toLowerCase().contains("windows")?
+                    (WBCryptolib) Native.loadLibrary("libwbcrypto", WBCryptolib.class):null ;
 
     /***********************************************sm3***********************************************/
     int WBCRYPTO_sm3(byte[] msg, int msglen, byte[] digest);
