@@ -32,7 +32,8 @@ public class KeyMsg implements Serializable  {
     @JoinTable(name="key_wbkey",
             joinColumns={ @JoinColumn(name="key_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="wb_key_id",referencedColumnName="id")})
-    private Collection<WhiboxKey> whiboxKeyList = new ArrayList<WhiboxKey>();
+//    private Collection<WhiboxKey> whiboxKeyList = new ArrayList<WhiboxKey>();
+    private Collection<WhiboxKey> whiboxKeyList;
 
     //白盒密钥表有效持续的时间（单位：天）
     @Column(nullable = false)
@@ -63,6 +64,7 @@ public class KeyMsg implements Serializable  {
         this.upOrDown = upOrDown;
         this.whiboxAlgName = whiboxAlgName;
         this.duration = duration;
+        this.whiboxKeyList = new ArrayList<>();
     }
 
     public Long getId() {

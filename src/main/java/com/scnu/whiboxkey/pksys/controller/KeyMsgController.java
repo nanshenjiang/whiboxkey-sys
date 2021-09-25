@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/whibox/manage")
+@CrossOrigin
 public class KeyMsgController {
     @Autowired
     private KeyMsgService keyMsgService;

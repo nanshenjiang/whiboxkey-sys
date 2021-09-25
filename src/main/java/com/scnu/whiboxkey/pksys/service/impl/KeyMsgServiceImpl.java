@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +37,13 @@ public class KeyMsgServiceImpl implements KeyMsgService {
     }
 
     @Override
+    @Transactional
     public KeyMsg save(KeyMsg keyMsg) {
         return keyMsgRepository.save(keyMsg);
     }
 
     @Override
+    @Transactional
     public KeyMsg update(Long id, KeyMsg keyMsg) {
         KeyMsg wk = this.findById(id);
         BeanUtils.copyProperties(keyMsg, wk, BeanUtilsExt.getNullPropertyNames(keyMsg));
@@ -48,6 +51,7 @@ public class KeyMsgServiceImpl implements KeyMsgService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         KeyMsg km = this.findById(id);
         Collection<WhiboxKey> whiboxKeyCollection = km.getWhiboxKeyList();
@@ -95,6 +99,7 @@ public class KeyMsgServiceImpl implements KeyMsgService {
      * 插入新的白盒密钥表
      */
     @Override
+    @Transactional
     public KeyMsg updateByWhiboxKey(Long id, WhiboxKey whiboxKey) {
         KeyMsg wk = this.findById(id);
         KeyMsg updateWk = this.findById(id);

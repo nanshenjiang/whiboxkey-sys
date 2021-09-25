@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +32,13 @@ public class WhiboxKeyServiceImpl implements WhiboxKeyService {
     }
 
     @Override
+    @Transactional
     public WhiboxKey save(WhiboxKey whiboxKey) {
         return whiboxKeyRepository.save(whiboxKey);
     }
 
     @Override
+    @Transactional
     public WhiboxKey update(Long id, WhiboxKey whiboxKey) {
         WhiboxKey wk = this.findById(id);
         BeanUtils.copyProperties(whiboxKey, wk, BeanUtilsExt.getNullPropertyNames(whiboxKey));
@@ -43,6 +46,7 @@ public class WhiboxKeyServiceImpl implements WhiboxKeyService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         WhiboxKey wk = this.findById(id);
         if (wk.getKeyFpath() != null) {

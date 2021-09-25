@@ -314,6 +314,9 @@ public class KeyDistributionController {
         }
         KeyMsg keyMsg = gatewayClientService.getDownKey(gatewayClient.getId());
         WhiboxKey whiboxKey = keyMsgService.findByVersion(keyMsg.getId(), version);
+        if(whiboxKey == null){
+            return JSONResult.error(401, "密钥版本不正确");
+        }
         ret.put("pass", whiboxKey.getPass());
         ret.put("version", whiboxKey.getVersion());
         return JSONResult.ok(ret);
@@ -324,6 +327,9 @@ public class KeyDistributionController {
                                @PathVariable("pass") String pass){
         //根据密钥通行证找到相关密钥进行下载操作
         WhiboxKey whiboxKey = whiboxKeyService.findByPass(pass);
+        if(whiboxKey == null){
+            return JSONResult.error(401, "通行证不正确");
+        }
         File file = new File(whiboxKey.getKeyFpath());
         if(!file.exists()){
             return JSONResult.error(404, "密钥文件生成出错，无法下载");

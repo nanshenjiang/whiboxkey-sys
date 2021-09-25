@@ -13,7 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/whibox/manage/client")
@@ -31,8 +33,13 @@ public class GatewayClientController {
     @GetMapping("/query")
     public JSONResult findServerKeyQuery(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                          @RequestParam(value = "size", defaultValue = "10") Integer size){
-        Page<GatewayClient> ret = gatewayClientService.findGCNoCriteria(page, size);
-        return JSONResult.ok(ret.getContent());
+        Page<GatewayClient> gatewayClientPage = gatewayClientService.findGCNoCriteria(page, size);
+        Map<String,Object> ret = new HashMap<>();
+        ret.put("list", gatewayClientPage.getContent());
+        ret.put("index", gatewayClientPage.getNumber());
+        ret.put("size", gatewayClientPage.getSize());
+        ret.put("total", gatewayClientPage.getTotalPages());
+        return JSONResult.ok(ret);
     }
 
     @GetMapping("/list")
