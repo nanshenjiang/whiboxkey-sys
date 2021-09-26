@@ -75,8 +75,8 @@ public class GatewayClientController {
         KeyMsg downKeyMsg = new KeyMsg(false,gcandkm.getDownalgname(),gcandkm.getDownduration());
         KeyMsg afDownKeyMsg = keyMsgService.save(downKeyMsg);
         //关联密钥与客户端
-        afgatewayClient.getWhiboxKeyList().add(afUpKeyMsg);
-        afgatewayClient.getWhiboxKeyList().add(afDownKeyMsg);
+        afgatewayClient.getKeyMsgList().add(afUpKeyMsg);
+        afgatewayClient.getKeyMsgList().add(afDownKeyMsg);
         GatewayClient afafgatewayClient = gatewayClientService.update(afgatewayClient.getId(), afgatewayClient);
         return JSONResult.ok(afafgatewayClient);
     }
@@ -93,12 +93,12 @@ public class GatewayClientController {
                                                      @PathVariable("kid") Long kid) {
         KeyMsg wk = keyMsgService.findById(kid);
         GatewayClient gatewayClient = gatewayClientService.findById(cid);
-        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getKeyMsgList();
         for(KeyMsg it: keyMsgCollection) {
             if (it.getUpOrDown() == wk.getUpOrDown())
                 return JSONResult.error(403,"仅能存在一个上行密钥或下行密钥");
         }
-        gatewayClient.getWhiboxKeyList().add(wk);
+        gatewayClient.getKeyMsgList().add(wk);
         GatewayClient afgatewayClient = gatewayClientService.update(cid, gatewayClient);
         return JSONResult.ok(afgatewayClient);
     }

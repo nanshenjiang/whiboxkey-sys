@@ -104,7 +104,7 @@ URL：http://112.74.182.172:7888/whibox/key/server/enc/server-test/client-test
 ```json
 {
     "algorithm": "WBSM4",
-    "mode": "cbc",
+    "mode": "gcm",
     "text": "000102030405060708090a0b0c0d0e0f"
 }
 ```

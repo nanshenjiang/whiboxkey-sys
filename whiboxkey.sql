@@ -11,23 +11,23 @@
  Target Server Version : 80025
  File Encoding         : 65001
 
- Date: 25/09/2021 20:03:14
+ Date: 27/09/2021 00:12:34
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for client_whibox_key
+-- Table structure for client_key
 -- ----------------------------
-DROP TABLE IF EXISTS `client_whibox_key`;
-CREATE TABLE `client_whibox_key`  (
-  `client_key_id` bigint(0) NOT NULL,
-  `whibox_key_id` bigint(0) NOT NULL,
-  UNIQUE INDEX `UK_msmjb902n4pg6ynom36ntdxor`(`whibox_key_id`) USING BTREE,
-  INDEX `FK6liftefubgh8nvprf7w0gqlj4`(`client_key_id`) USING BTREE,
-  CONSTRAINT `FK6liftefubgh8nvprf7w0gqlj4` FOREIGN KEY (`client_key_id`) REFERENCES `gateway_client` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `FKs71tfiacixwl94fdxoytbl0fd` FOREIGN KEY (`whibox_key_id`) REFERENCES `key_msg` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+DROP TABLE IF EXISTS `client_key`;
+CREATE TABLE `client_key`  (
+  `client_id` bigint(0) NOT NULL,
+  `key_id` bigint(0) NOT NULL,
+  UNIQUE INDEX `UK_an5r75i0q4aj7rtah0bdy6r2a`(`key_id`) USING BTREE,
+  INDEX `FK3wbxf20i54w37fsx1wtwjrnmu`(`client_id`) USING BTREE,
+  CONSTRAINT `FK3wbxf20i54w37fsx1wtwjrnmu` FOREIGN KEY (`client_id`) REFERENCES `gateway_client` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKfe6objggtj4h9qewxeppfd39f` FOREIGN KEY (`key_id`) REFERENCES `key_msg` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------

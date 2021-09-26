@@ -35,9 +35,9 @@ public class GatewayClient implements Serializable {
 
     //一个客户端密钥对应上行密钥和下行密钥
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name="client_whibox_key",
-            joinColumns={ @JoinColumn(name="client_key_id",referencedColumnName="id")},
-            inverseJoinColumns={@JoinColumn(name="whibox_key_id",referencedColumnName="id")})
+    @JoinTable(name="client_key",
+            joinColumns={ @JoinColumn(name="client_id",referencedColumnName="id")},
+            inverseJoinColumns={@JoinColumn(name="key_id",referencedColumnName="id")})
 //    private Collection<KeyMsg> keyMsgList = new ArrayList<KeyMsg>();
     private Collection<KeyMsg> keyMsgList;
 
@@ -100,11 +100,11 @@ public class GatewayClient implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Collection<KeyMsg> getWhiboxKeyList() {
+    public Collection<KeyMsg> getKeyMsgList() {
         return keyMsgList;
     }
 
-    public void setWhiboxKeyList(Collection<KeyMsg> keyMsgList) {
+    public void setKeyMsgList(Collection<KeyMsg> keyMsgList) {
         this.keyMsgList = keyMsgList;
     }
 }

@@ -63,7 +63,7 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     @Transactional
     public void deleteById(Long id) {
         GatewayClient clientKey = this.findById(id);
-        Collection<KeyMsg> keyMsgCollection = clientKey.getWhiboxKeyList();
+        Collection<KeyMsg> keyMsgCollection = clientKey.getKeyMsgList();
         for(KeyMsg it: keyMsgCollection){
             keyMsgService.deleteById(it.getId());
         }
@@ -79,7 +79,7 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     public KeyMsg getUpKey(Long id) {
         GatewayClient gatewayClient = this.findById(id);
         KeyMsg keyMsg =null;
-        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getKeyMsgList();
         for(KeyMsg it: keyMsgCollection) {
             if(it.getUpOrDown()) {
                 keyMsg = it;
@@ -93,7 +93,7 @@ public class GatewayClientServiceImpl implements GatewayClientService {
     public KeyMsg getDownKey(Long id) {
         GatewayClient gatewayClient = this.findById(id);
         KeyMsg keyMsg =null;
-        Collection<KeyMsg> keyMsgCollection = gatewayClient.getWhiboxKeyList();
+        Collection<KeyMsg> keyMsgCollection = gatewayClient.getKeyMsgList();
         for(KeyMsg it: keyMsgCollection) {
             if(!it.getUpOrDown()) {
                 keyMsg = it;
