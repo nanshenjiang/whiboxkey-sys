@@ -102,6 +102,22 @@ public class KeyDistributionController {
         }
     }
 
+    /**
+     * @return 判断当前客户端身份序列是否有效
+     */
+    private boolean checkServerVaild(String sserial) {
+        GatewayServer gatewayServer = gatewayServerService.findBySerial(sserial);
+        return gatewayServer.getVaild();
+    }
+
+    /**
+     * @return 判断当前客户端身份序列是否有效
+     */
+    private boolean checkClientVaild(String cserial) {
+        GatewayClient gatewayClient = gatewayClientService.findBySerial(cserial);
+        return gatewayClient.getVaild();
+    }
+
     @PostMapping("/server/enc/{sserial}/{cserial}")
     public JSONResult serverEncData(@PathVariable("sserial") String sserial,
                                     @PathVariable("cserial") String cserial,
@@ -167,39 +183,39 @@ public class KeyDistributionController {
                                     @RequestParam("mode") String getMode,
                                     @RequestParam("text") String getText) {
         if(!ByteUtil.isHexStr(getIv)||!ByteUtil.isHexStr(getText)){
-            return JSONResult.error(400,"输入的消息或iv值需转换为16进制!");
+            return JSONResult.error(500,"输入的消息或iv值需转换为16进制!");
         }
         if(getMode.equals("cbc")){
             if(getIv.length()!=32){
-                return JSONResult.error(400,"cbc模式的iv值需转换为16bytes长度的16进制数!");
+                return JSONResult.error(500,"cbc模式的iv值需转换为16bytes长度的16进制数!");
             }
         }
         Map ret=new HashMap<>();
         //查询服务端
         GatewayServer gatewayServer = gatewayServerService.findBySerial(sserial);
         if(gatewayServer == null){
-            return JSONResult.error(401, "未找到匹配的服务端");
+            return JSONResult.error(500, "未找到匹配的服务端");
         }
         if(!gatewayServer.getVaild()) {
-            return JSONResult.error(401, "服务端授权失效");
+            return JSONResult.error(500, "服务端授权失效");
         }
         //查询客户端
         GatewayClient gatewayClient = gatewayServerService.findByClientSerial(gatewayServer.getId(), cserial);
         if(gatewayClient == null){
-            return JSONResult.error(401, "未找到匹配的客户端");
+            return JSONResult.error(500, "未找到匹配的客户端");
         }
         if(!gatewayClient.getVaild()) {
-            return JSONResult.error(401, "客户端授权失效");
+            return JSONResult.error(500, "客户端授权失效");
         }
         //算法待扩展
         if(!getAlgorithm.equals("WBSM4")){
-            return JSONResult.error(400, "目前仅支持算法：WBSM4");
+            return JSONResult.error(500, "目前仅支持算法：WBSM4");
         }
         //查询对应密钥
         KeyMsg keyMsg = gatewayClientService.getUpKey(gatewayClient.getId());
         WhiboxKey whiboxKey = keyMsgService.findByVersion(keyMsg.getId(), version);
         if(whiboxKey == null){
-            return JSONResult.error(401, "版本错误，未查找到密钥！");
+            return JSONResult.error(500, "版本错误，未查找到密钥！");
         }
         //获取当前黑盒密钥
         String key=SM4EncKey.KeystoreSM4DecKey(whiboxKey.getBlackKey());
@@ -217,7 +233,7 @@ public class KeyDistributionController {
             ret.put("answer", sm4EncGCM.getAns());
             ret.put("tag", sm4EncGCM.getTag());
         }else {
-            return JSONResult.error(400, "请注意：加密模式参数为cbc或gcm");
+            return JSONResult.error(500, "请注意：加密模式参数为cbc或gcm");
         }
         ret.put("version", whiboxKey.getVersion());
         return JSONResult.ok(ret);
@@ -302,7 +318,7 @@ public class KeyDistributionController {
     }
 
     @GetMapping("/client/down/{serial}/{version}")
-    public JSONResult clientAttachKey(@PathVariable("serial") String serial,
+    public JSONResult clientAttachDownKey(@PathVariable("serial") String serial,
                                       @PathVariable("version") Long version) {
         Map ret=new HashMap<>();
         GatewayClient gatewayClient = gatewayClientService.findBySerial(serial);

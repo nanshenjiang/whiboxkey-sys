@@ -31,7 +31,7 @@ public class GatewayServer implements Serializable {
             joinColumns={ @JoinColumn(name="server_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="client_id",referencedColumnName="id")})
 //    private Collection<GatewayClient> clientKeyList = new ArrayList<GatewayClient>();
-      private Collection<GatewayClient> clientKeyList;
+    private Collection<GatewayClient> clientKeyList;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;

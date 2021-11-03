@@ -33,6 +33,9 @@ public class GatewayClient implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
+    @Column(nullable = false)
+    private String gatewayServerSerial;
+
     //一个客户端密钥对应上行密钥和下行密钥
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name="client_key",
@@ -44,10 +47,10 @@ public class GatewayClient implements Serializable {
     public GatewayClient() {
     }
 
-    public GatewayClient(String serial, Boolean vaild) {
+    public GatewayClient(String serial, Boolean vaild, String gatewayServerSerial) {
         this.serial = serial;
         this.vaild = vaild;
-        this.keyMsgList = new ArrayList<KeyMsg>();
+        this.gatewayServerSerial = gatewayServerSerial;
     }
 
     @PrePersist
@@ -106,5 +109,13 @@ public class GatewayClient implements Serializable {
 
     public void setKeyMsgList(Collection<KeyMsg> keyMsgList) {
         this.keyMsgList = keyMsgList;
+    }
+
+    public String getGatewayServerSerial() {
+        return gatewayServerSerial;
+    }
+
+    public void setGatewayServerSerial(String gatewayServerSerial) {
+        this.gatewayServerSerial = gatewayServerSerial;
     }
 }
