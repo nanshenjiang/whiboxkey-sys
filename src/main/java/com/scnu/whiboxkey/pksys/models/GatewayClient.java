@@ -33,6 +33,7 @@ public class GatewayClient implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
+    //与服务端对应的身份序列
     @Column(nullable = false)
     private String gatewayServerSerial;
 
@@ -51,6 +52,7 @@ public class GatewayClient implements Serializable {
         this.serial = serial;
         this.vaild = vaild;
         this.gatewayServerSerial = gatewayServerSerial;
+        this.keyMsgList = new ArrayList<KeyMsg>();
     }
 
     @PrePersist

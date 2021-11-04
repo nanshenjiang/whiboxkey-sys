@@ -11,7 +11,7 @@
  Target Server Version : 80025
  File Encoding         : 65001
 
- Date: 27/09/2021 00:12:34
+ Date: 04/11/2021 19:43:02
 */
 
 SET NAMES utf8mb4;
@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS `gateway_client`;
 CREATE TABLE `gateway_client`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `create_time` datetime(6) NULL DEFAULT NULL,
+  `gateway_server_serial` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `serial` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `update_time` datetime(6) NULL DEFAULT NULL,
   `vaild` bit(1) NOT NULL,
