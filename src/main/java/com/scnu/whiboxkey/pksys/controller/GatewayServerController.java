@@ -25,18 +25,7 @@ public class GatewayServerController {
     public JSONResult findServerKeyQuery(@RequestParam(value = "index", defaultValue = "0") Integer index,
                                   @RequestParam(value = "size", defaultValue = "10") Integer size){
         Page<GatewayServer> gatewayServerPage = gatewayServerService.findGSNoCriteria(index, size);
-//        List<GatewayServer> gatewayServerList = gatewayServerPage.getContent();
-//        List<Map<String,Object>> gsMapList = new ArrayList<>();
         Map<String,Object> ret = new HashMap<>();
-//        for(GatewayServer gs:gatewayServerList){
-//            Map<String,Object> gsMap = new HashMap<>();
-//            gsMap.put("id", gs.getId());
-//            gsMap.put("serial", gs.getSerial());
-//            gsMap.put("vaild", gs.getVaild());
-//            gsMap.put("date", gs.getCreateTime());
-//            gsMap.put("connectNum", gs.getClientKeyList().size());
-//            gsMapList.add(gsMap);
-//        }
         ret.put("list", gatewayServerPage.getContent());
         ret.put("index", gatewayServerPage.getNumber());
         ret.put("size", gatewayServerPage.getSize());
