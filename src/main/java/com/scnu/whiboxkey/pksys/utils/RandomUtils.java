@@ -2,6 +2,12 @@ package com.scnu.whiboxkey.pksys.utils;
 
 import java.util.Random;
 
+/**
+ * 随机数生成器
+ * randomString 生成随机字符串
+ * randomNumStr 生成随机数字串
+ * random16Hex 生成随机16进制串
+ */
 public class RandomUtils {
 
     private static Random strGen = new Random();

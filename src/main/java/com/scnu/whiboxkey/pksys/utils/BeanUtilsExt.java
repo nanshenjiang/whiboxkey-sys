@@ -6,6 +6,9 @@ import org.springframework.beans.BeanWrapperImpl;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 辅助函数：用于对象更新
+ */
 public class BeanUtilsExt {
 
     public static String[] getNullPropertyNames (Object source) {

@@ -1,5 +1,7 @@
 package com.scnu.whiboxkey.pksys.models;
 
+import com.scnu.whiboxkey.pksys.utils.JWTUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,9 +18,19 @@ public class GatewayServer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //服务端唯一标识，用于验证服务端身份
+    //服务端身份序列，用于验证服务端身份，每个服务端身份序列唯一
     @Column(nullable = false, unique = true, length = 50)
     private String serial;
+
+    //服务端所在的IP地址，用于验证服务端当前所处ip是否准确
+    @Column(nullable = false, length = 50)
+    private String ip;
+
+    //服务端所对应的IP地址，初始化服务端信息时生成
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition = "text", nullable = false)
+    private String token;
 
     //有效性，服务端是否是否有效
     @Column(nullable = false)
@@ -40,6 +52,14 @@ public class GatewayServer implements Serializable {
     private Date updateTime;
 
     public GatewayServer() {
+    }
+
+    public GatewayServer(String serial, String ip, Boolean vaild) {
+        this.serial = serial;
+        this.ip = ip;
+        this.vaild = vaild;
+        this.clientKeyList = new ArrayList<GatewayClient>();
+        this.token = JWTUtils.createToken(serial, ip);
     }
 
     @PrePersist
@@ -66,6 +86,22 @@ public class GatewayServer implements Serializable {
 
     public void setSerial(String serial) {
         this.serial = serial;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Boolean getVaild() {

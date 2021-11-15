@@ -1,5 +1,9 @@
 package com.scnu.whiboxkey.pksys.utils;
 
+/**
+ * 返回信息格式
+ * JSON格式封装
+ */
 public class JSONResult {
     private Integer code;
     private Object data;

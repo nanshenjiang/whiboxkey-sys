@@ -60,8 +60,10 @@ public class GatewayServerController {
 
     @PostMapping
     public JSONResult createServerKey(@RequestBody GatewayServer gatewayServer) {
-        GatewayServer afgatewayServer = gatewayServerService.save(gatewayServer);
-        return JSONResult.ok(afgatewayServer);
+        //新建服务端
+        GatewayServer gs = new GatewayServer(gatewayServer.getSerial(), gatewayServer.getIp(), gatewayServer.getVaild());
+        GatewayServer afGatewayServer = gatewayServerService.save(gs);
+        return JSONResult.ok(afGatewayServer);
     }
 
     @PutMapping("/{id}")

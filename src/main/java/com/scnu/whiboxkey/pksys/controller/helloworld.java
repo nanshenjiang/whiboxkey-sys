@@ -3,18 +3,13 @@ package com.scnu.whiboxkey.pksys.controller;
 import com.scnu.whiboxkey.pksys.crypto.SM4EncKey;
 import com.scnu.whiboxkey.pksys.crypto.Sm4EncCBC;
 import com.scnu.whiboxkey.pksys.crypto.Sm4EncGCM;
-import com.scnu.whiboxkey.pksys.crypto.WBCryptolib;
-import com.scnu.whiboxkey.pksys.utils.ByteUtil;
-import com.scnu.whiboxkey.pksys.utils.JSONResult;
-import com.scnu.whiboxkey.pksys.utils.RandomUtils;
-import com.sun.jna.ptr.IntByReference;
+import com.scnu.whiboxkey.pksys.utils.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/whibox")
@@ -57,5 +52,15 @@ public class helloworld {
         System.out.println("sm4-gcm解密结果："+gcm_dec.getAns());
         System.out.println("sm4-gcm解密tag值："+gcm_dec.getTag());
         return JSONResult.ok("ok");
+    }
+
+    @GetMapping("/test/token")
+    public JSONResult test_token(HttpServletResponse response){
+        String token = JWTUtils.createToken("test","192.168.1.1");
+        System.out.println(token);
+        Boolean flag = JWTUtils.validateToken(token, "test","192.168.1.1");
+        System.out.println(flag);
+        response.setHeader(JWTUtils.AUTH_TOKEN, token);
+        return JSONResult.ok(flag);
     }
 }

@@ -1,14 +1,13 @@
 package com.scnu.whiboxkey.pksys.models;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-import jdk.nashorn.internal.objects.annotations.Setter;
-
 public class GCandKM {
     private String serial;
 
     private Boolean vaild;
 
     private Long sid;
+
+    private String sip;
 
     private String upalgname;
 
@@ -21,10 +20,11 @@ public class GCandKM {
     public GCandKM() {
     }
 
-    public GCandKM(String serial, Boolean vaild, Long sid, String upalgname, Integer upduration, String downalgname, Integer downduration) {
+    public GCandKM(String serial, Boolean vaild, Long sid, String sip, String upalgname, Integer upduration, String downalgname, Integer downduration) {
         this.serial = serial;
         this.vaild = vaild;
         this.sid = sid;
+        this.sip = sip;
         this.upalgname = upalgname;
         this.upduration = upduration;
         this.downalgname = downalgname;
@@ -53,6 +53,14 @@ public class GCandKM {
 
     public void setSid(Long sid) {
         this.sid = sid;
+    }
+
+    public String getSip() {
+        return sip;
+    }
+
+    public void setSip(String sip) {
+        this.sip = sip;
     }
 
     public String getUpalgname() {

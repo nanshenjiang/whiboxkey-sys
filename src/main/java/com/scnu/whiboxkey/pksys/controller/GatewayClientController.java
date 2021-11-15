@@ -63,7 +63,10 @@ public class GatewayClientController {
     @PostMapping("/combination")
     public JSONResult createClientKeyWithCombination(@RequestBody GCandKM gcandkm) {
         //新建客户端
-        GatewayClient gatewayClient = new GatewayClient(gcandkm.getSerial(),gcandkm.getVaild(),gatewayServerService.findById(gcandkm.getSid()).getSerial());
+        GatewayClient gatewayClient = new GatewayClient(gcandkm.getSerial(),
+                                                        gcandkm.getSip(),
+                                                        gcandkm.getVaild(),
+                                                        gatewayServerService.findById(gcandkm.getSid()).getSerial());
         GatewayClient afgatewayClient = gatewayClientService.save(gatewayClient);
         //建立客户端和服务端连接
         GatewayServer gs = gatewayServerService.findById(gcandkm.getSid());

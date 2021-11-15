@@ -14,3 +14,8 @@ spring:
     show-sql: true
     database: mysql
 
+jwt:
+  header: "Authorization"
+  tokenPrefix: ""
+  secret: "scnucrypto511"
+  expireTime: 10512000  #20年有效期：60*24*365*20

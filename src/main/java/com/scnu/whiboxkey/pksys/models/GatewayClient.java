@@ -1,5 +1,7 @@
 package com.scnu.whiboxkey.pksys.models;
 
+import com.scnu.whiboxkey.pksys.utils.JWTUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,9 +18,19 @@ public class GatewayClient implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //客户端唯一标识，用于验证客户端身份
+    //客户端身份序列，用于验证客户端身份，每个客户端身份序列唯一
     @Column(nullable = false, unique = true, length = 50)
     private String serial;
+
+    //客户端所在的IP地址，用于验证客户端当前所处ip是否准确
+    @Column(nullable = false, length = 50)
+    private String ip;
+
+    //客户端所对应的IP地址，初始化客户端信息时生成
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition = "text", nullable = false)
+    private String token;
 
     //有效性，是否有效，有效才允许分发密钥表
     @Column(nullable = false)
@@ -48,11 +60,13 @@ public class GatewayClient implements Serializable {
     public GatewayClient() {
     }
 
-    public GatewayClient(String serial, Boolean vaild, String gatewayServerSerial) {
+    public GatewayClient(String serial, String ip, Boolean vaild, String gatewayServerSerial) {
         this.serial = serial;
+        this.ip = ip;
         this.vaild = vaild;
         this.gatewayServerSerial = gatewayServerSerial;
         this.keyMsgList = new ArrayList<KeyMsg>();
+        this.token = JWTUtils.createToken(serial, ip);
     }
 
     @PrePersist
@@ -81,6 +95,22 @@ public class GatewayClient implements Serializable {
         this.serial = serial;
     }
 
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public Boolean getVaild() {
         return vaild;
     }
@@ -105,19 +135,19 @@ public class GatewayClient implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Collection<KeyMsg> getKeyMsgList() {
-        return keyMsgList;
-    }
-
-    public void setKeyMsgList(Collection<KeyMsg> keyMsgList) {
-        this.keyMsgList = keyMsgList;
-    }
-
     public String getGatewayServerSerial() {
         return gatewayServerSerial;
     }
 
     public void setGatewayServerSerial(String gatewayServerSerial) {
         this.gatewayServerSerial = gatewayServerSerial;
+    }
+
+    public Collection<KeyMsg> getKeyMsgList() {
+        return keyMsgList;
+    }
+
+    public void setKeyMsgList(Collection<KeyMsg> keyMsgList) {
+        this.keyMsgList = keyMsgList;
     }
 }

@@ -6,26 +6,25 @@ import com.scnu.whiboxkey.pksys.service.GatewayClientService;
 import com.scnu.whiboxkey.pksys.service.GatewayServerService;
 import com.scnu.whiboxkey.pksys.service.KeyMsgService;
 import com.scnu.whiboxkey.pksys.service.WhiboxKeyService;
-import com.scnu.whiboxkey.pksys.utils.ByteUtil;
-import com.scnu.whiboxkey.pksys.utils.JSONResult;
-import com.scnu.whiboxkey.pksys.utils.RandomUtils;
+import com.scnu.whiboxkey.pksys.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
 /**
- * 面向VPN/网关的主要接口
+ * 面向VPN/网关的主要接口，带token验证的
  * 包含：
  * 1. SM4加密、SM4解密
  * 2. 获取上行或下行白盒密钥表的通行证
  * 3. 根据通行证下载白盒密钥表
  */
 @RestController
-@RequestMapping("/whibox/key")
-public class KeyDistributionController {
+@RequestMapping("/whibox/key/verify")
+public class KeyDisWithVerifyController {
     @Autowired
     private GatewayServerService gatewayServerService;
 
@@ -89,11 +88,6 @@ public class KeyDistributionController {
             Date currentTime = new Date(System.currentTimeMillis());
             if (currentTime.compareTo(wk.getEffectiveTime()) > 0) {
                 //密钥过期，更新密钥
-//                String oldKfpath = wk.getKeyFpath();
-//                File oldkfile = new File(oldKfpath);
-//                if (oldkfile.exists()) {
-//                    oldkfile.delete();
-//                }
                 WhiboxKey storewk = genRandKeyAndUpdateDB(keyMsg.getWhiboxAlgName(),keyMsg.getUpOrDown(),keyMsg.getDuration(), wk.getVersion()+1);
                 keyMsgService.updateByWhiboxKey(keyMsg.getId(), storewk);
                 return storewk;
@@ -110,25 +104,22 @@ public class KeyDistributionController {
     }
 
     /**
-     * @return 判断当前客户端身份序列是否有效
+     * @return 判断当前身份序列是否有效
      */
-    private boolean checkServerVaild(String sserial) {
-        GatewayServer gatewayServer = gatewayServerService.findBySerial(sserial);
-        return gatewayServer.getVaild();
-    }
-
-    /**
-     * @return 判断当前客户端身份序列是否有效
-     */
-    private boolean checkClientVaild(String cserial) {
-        GatewayClient gatewayClient = gatewayClientService.findBySerial(cserial);
-        return gatewayClient.getVaild();
+    private boolean checkServerVaild(HttpServletRequest request, String serial) {
+        String TOKEN = request.getHeader(JWTUtils.AUTH_TOKEN);
+        String IP = GetIpUtil.getRealIp(request);
+        return JWTUtils.validateToken(TOKEN, serial, IP);
     }
 
     @PostMapping("/server/enc/{sserial}/{cserial}")
-    public JSONResult serverEncData(@PathVariable("sserial") String sserial,
+    public JSONResult serverEncData(HttpServletRequest request,
+                                    @PathVariable("sserial") String sserial,
                                     @PathVariable("cserial") String cserial,
                                     @RequestBody CommunicationMsg communicationMsg) throws FileNotFoundException {
+        if(!checkServerVaild(request, sserial)){
+            return JSONResult.error(400,"token值无效");
+        }
         if(!ByteUtil.isHexStr(communicationMsg.getText())){
             return JSONResult.error(400,"输入的消息或iv值需转换为16进制!");
         }
@@ -182,13 +173,17 @@ public class KeyDistributionController {
     }
 
     @GetMapping("/server/dec/{sserial}/{cserial}/{version}")
-    public JSONResult serverDecDataGet(@PathVariable("sserial") String sserial,
-                                    @PathVariable("cserial") String cserial,
-                                    @PathVariable("version") Long version,
-                                    @RequestParam("algorithm") String getAlgorithm,
-                                    @RequestParam("iv") String getIv,
-                                    @RequestParam("mode") String getMode,
-                                    @RequestParam("text") String getText) {
+    public JSONResult serverDecDataGet(HttpServletRequest request,
+                                       @PathVariable("sserial") String sserial,
+                                       @PathVariable("cserial") String cserial,
+                                       @PathVariable("version") Long version,
+                                       @RequestParam("algorithm") String getAlgorithm,
+                                       @RequestParam("iv") String getIv,
+                                       @RequestParam("mode") String getMode,
+                                       @RequestParam("text") String getText) {
+        if(!checkServerVaild(request, sserial)){
+            return JSONResult.error(400,"token值无效");
+        }
         if(!ByteUtil.isHexStr(getIv)||!ByteUtil.isHexStr(getText)){
             return JSONResult.error(500,"输入的消息或iv值需转换为16进制!");
         }
@@ -247,10 +242,14 @@ public class KeyDistributionController {
     }
 
     @PostMapping("/server/dec/{sserial}/{cserial}/{version}")
-    public JSONResult serverDecData(@PathVariable("sserial") String sserial,
+    public JSONResult serverDecData(HttpServletRequest request,
+                                    @PathVariable("sserial") String sserial,
                                     @PathVariable("cserial") String cserial,
                                     @PathVariable("version") Long version,
                                     @RequestBody CommunicationMsg communicationMsg) {
+        if(!checkServerVaild(request, sserial)){
+            return JSONResult.error(400,"token值无效");
+        }
         if(!ByteUtil.isHexStr(communicationMsg.getIv())||!ByteUtil.isHexStr(communicationMsg.getText())){
             return JSONResult.error(400,"输入的消息或iv值需转换为16进制!");
         }
@@ -308,7 +307,11 @@ public class KeyDistributionController {
     }
 
     @GetMapping("/client/up/{serial}")
-    public JSONResult clientAttachUpKey(@PathVariable("serial") String serial) throws FileNotFoundException {
+    public JSONResult clientAttachUpKey(HttpServletRequest request,
+                                        @PathVariable("serial") String serial) throws FileNotFoundException {
+        if(!checkServerVaild(request, serial)){
+            return JSONResult.error(400,"token值无效");
+        }
         Map ret=new HashMap<>();
         GatewayClient gatewayClient = gatewayClientService.findBySerial(serial);
         if(gatewayClient == null){
@@ -325,8 +328,12 @@ public class KeyDistributionController {
     }
 
     @GetMapping("/client/down/{serial}/{version}")
-    public JSONResult clientAttachDownKey(@PathVariable("serial") String serial,
-                                      @PathVariable("version") Long version) {
+    public JSONResult clientAttachDownKey(HttpServletRequest request,
+                                          @PathVariable("serial") String serial,
+                                          @PathVariable("version") Long version) {
+        if(!checkServerVaild(request, serial)){
+            return JSONResult.error(400,"token值无效");
+        }
         Map ret=new HashMap<>();
         GatewayClient gatewayClient = gatewayClientService.findBySerial(serial);
         if(gatewayClient == null){
@@ -345,9 +352,14 @@ public class KeyDistributionController {
         return JSONResult.ok(ret);
     }
 
-    @GetMapping("/download/{pass}")
-    public JSONResult keyFileDownLoad(HttpServletResponse response,
-                               @PathVariable("pass") String pass){
+    @GetMapping("/download/{serial}/{pass}")
+    public JSONResult keyFileDownLoad(HttpServletRequest request,
+                                      HttpServletResponse response,
+                                      @PathVariable("serial") String serial,
+                                      @PathVariable("pass") String pass){
+        if(!checkServerVaild(request, serial)){
+            return JSONResult.error(400,"token值无效");
+        }
         //根据密钥通行证找到相关密钥进行下载操作
         WhiboxKey whiboxKey = whiboxKeyService.findByPass(pass);
         if(whiboxKey == null){
@@ -375,12 +387,5 @@ public class KeyDistributionController {
             return JSONResult.error(404, "下载失败");
         }
         return null;
-    }
-
-    @PutMapping("/wk/update/{id}")
-    public JSONResult uploadWhiboxKey(@PathVariable("id") Long id) throws FileNotFoundException {
-        KeyMsg keyMsg = keyMsgService.findById(id);
-        WhiboxKey retWk = judgeKeyLegalAndGenKey(keyMsg);
-        return JSONResult.ok(retWk);
     }
 }
