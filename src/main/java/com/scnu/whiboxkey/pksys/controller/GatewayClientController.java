@@ -8,6 +8,7 @@ import com.scnu.whiboxkey.pksys.service.GatewayClientService;
 import com.scnu.whiboxkey.pksys.service.GatewayServerService;
 import com.scnu.whiboxkey.pksys.service.KeyMsgService;
 import com.scnu.whiboxkey.pksys.utils.JSONResult;
+import com.scnu.whiboxkey.pksys.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -86,7 +87,12 @@ public class GatewayClientController {
 
     @PutMapping("/{id}")
     public JSONResult updateClientKey(@PathVariable("id") Long id,
-                                         @RequestBody GatewayClient gatewayClient) {
+                                      @RequestBody GatewayClient gatewayClient) {
+        GatewayClient oldgatewayClient = gatewayClientService.findById(id);
+        if(!oldgatewayClient.getIp().equals(gatewayClient.getIp())
+                ||!oldgatewayClient.getSerial().equals(gatewayClient.getSerial())){
+            gatewayClient.setToken(JWTUtils.createToken(gatewayClient.getSerial(), gatewayClient.getIp()));
+        }
         GatewayClient afgatewayClient = gatewayClientService.update(id, gatewayClient);
         return JSONResult.ok(afgatewayClient);
     }
