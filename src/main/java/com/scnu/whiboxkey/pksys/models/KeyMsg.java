@@ -28,7 +28,7 @@ public class KeyMsg implements Serializable  {
 
     //一份密钥对应多个版本白盒密钥
     //以防密钥过期，但该密钥仍在使用
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinTable(name="key_wbkey",
             joinColumns={ @JoinColumn(name="key_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="wb_key_id",referencedColumnName="id")})

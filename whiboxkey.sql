@@ -11,7 +11,7 @@
  Target Server Version : 80025
  File Encoding         : 65001
 
- Date: 04/11/2021 19:43:02
+ Date: 19/11/2021 11:15:03
 */
 
 SET NAMES utf8mb4;
@@ -38,7 +38,9 @@ CREATE TABLE `gateway_client`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `create_time` datetime(6) NULL DEFAULT NULL,
   `gateway_server_serial` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `serial` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `update_time` datetime(6) NULL DEFAULT NULL,
   `vaild` bit(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
@@ -52,7 +54,9 @@ DROP TABLE IF EXISTS `gateway_server`;
 CREATE TABLE `gateway_server`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `create_time` datetime(6) NULL DEFAULT NULL,
+  `ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `serial` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `update_time` datetime(6) NULL DEFAULT NULL,
   `vaild` bit(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
@@ -84,7 +88,7 @@ CREATE TABLE `key_msg`  (
   `update_time` datetime(6) NULL DEFAULT NULL,
   `whibox_alg_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for key_wbkey

@@ -50,7 +50,7 @@ public class GatewayClient implements Serializable {
     private String gatewayServerSerial;
 
     //一个客户端密钥对应上行密钥和下行密钥
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinTable(name="client_key",
             joinColumns={ @JoinColumn(name="client_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="key_id",referencedColumnName="id")})

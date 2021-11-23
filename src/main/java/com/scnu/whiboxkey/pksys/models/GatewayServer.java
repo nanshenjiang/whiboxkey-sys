@@ -38,7 +38,7 @@ public class GatewayServer implements Serializable {
     private Boolean vaild;
 
     //服务端关联客户端关系
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinTable(name="gateway_server_client",
             joinColumns={ @JoinColumn(name="server_id",referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="client_id",referencedColumnName="id")})
