@@ -1017,8 +1017,11 @@ int ws_connectToServer(char *ip, int port, char *path, int timeoutMs)
     }
 
     //非阻塞
-    ret = fcntl(fd, F_GETFL, 0);
-    fcntl(fd, F_SETFL, ret | O_NONBLOCK);
+//    ret = fcntl(fd, F_GETFL, 0);
+//    fcntl(fd, F_SETFL, ret | O_NONBLOCK);
+    //阻塞
+     ret = fcntl(fd, F_GETFL, 0);
+     fcntl(fd, F_SETFL, ret & ~O_NONBLOCK);
 
     //发送http协议头
     memset(shakeKey, 0, sizeof(shakeKey));
