@@ -1,6 +1,8 @@
 package com.scnu.whiboxkey.pksys.crypto;
 
 import com.scnu.whiboxkey.pksys.utils.ByteUtil;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
 import java.nio.charset.StandardCharsets;
@@ -81,6 +83,8 @@ public class Sm4EncCBC {
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_cbc_encrypt(tbyte, tbyte.length, ans_byte, ans_byte.length, use_len, sm4_context, ivbyte);
         this.ans = ByteUtil.byteArrayToHexStr(ans_byte, use_len.getValue());
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_context_free(sm4_context);
+//        long peer = Pointer.nativeValue(use_len.getPointer());
+//        Native.free(peer);
     }
 
     /**
@@ -97,5 +101,7 @@ public class Sm4EncCBC {
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_cbc_decrypt(tbyte, tbyte.length, ans_byte, ans_byte.length, use_len, sm4_context, ivbyte);
         this.ans = ByteUtil.byteArrayToHexStr(ans_byte, use_len.getValue());
         WBCryptolib.INSTANCE.WBCRYPTO_sm4_context_free(sm4_context);
+//        long peer = Pointer.nativeValue(use_len.getPointer());
+//        Native.free(peer);
     }
 }
