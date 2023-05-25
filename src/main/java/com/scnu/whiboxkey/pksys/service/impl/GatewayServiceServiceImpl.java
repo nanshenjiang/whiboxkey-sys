@@ -38,8 +38,10 @@ public class GatewayServiceServiceImpl implements GatewayServerService {
 
     @Override
     public GatewayServer findById(Long id) {
-        Optional<GatewayServer> optional = serverKeyRepository.findById(id);
-        return optional.orElseGet(GatewayServer::new);
+//        Optional<GatewayServer> optional = serverKeyRepository.findById(id);
+//        return optional.orElseGet(GatewayServer::new);
+        GatewayServer gatewayServer = serverKeyRepository.findById(id).orElse(null);
+        return gatewayServer;
     }
 
     @Override
